@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Poste Restante</string>
+    <string name="channel_walk">The round</string>
+    <string name="walk_title">On the round</string>
+    <string name="walk_text">Mail is handed over as you pass the houses.</string>
+    <string name="walk_stop">End the round</string>
+    <string name="channel_mail">Mail on the way</string>
+</resources>

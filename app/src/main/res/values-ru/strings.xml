@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">До востребования</string>
+    <string name="channel_walk">Обход</string>
+    <string name="walk_title">Почтальон на обходе</string>
+    <string name="walk_text">Письма вручаются, когда проходите мимо домов.</string>
+    <string name="walk_stop">Закончить обход</string>
+    <string name="channel_mail">Почта по дороге</string>
+</resources>

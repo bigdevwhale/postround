@@ -1,0 +1,78 @@
+id	pick	name_ru	dat_ru	name_en	role_ru	role_en	look
+lev	water	Лев Аркадьевич	Льву Аркадьевичу	Mr Leo Arden	бывший судовой механик	a retired ship's engineer	hair=grey,cloth=navy,cap,moustache
+nina	far:lev	Нина Георгиевна	Нине Георгиевне	Mrs Nina Gale	чертёжница на пенсии	a retired draughtswoman	hair=grey,cloth=enamel,bun,glasses
+gleb	any	Глеб Сергеевич	Глебу Сергеевичу	Mr Gilbert Sayer	пенсионер, кандидат в мастера спорта	retired, once a chess candidate master	hair=grey,cloth=oak,beard,glasses
+tim	near:gleb	Тимофей	Тимофею	Tim	пятиклассник, шахматный кружок	a schoolboy from the chess club	hair=ginger,cloth=red
+zoya	any	Зоя Михайловна	Зое Михайловне	Mrs Zoe Michaels	вяжет на весь подъезд	knits for the whole stairwell	hair=grey,cloth=jam,kerchief=red
+arist	any	Аристарх Павлович	Аристарху Павловичу	Mr Aristide Paul	решает кроссворды	does the crossword	hair=grey,cloth=green,glasses,moustache
+vera	any	Вера	Вере	Vera	третьеклассница, глава тайного общества	a schoolgirl, head of a secret society	hair=dark,cloth=apple,pigtails
+kostya	far:vera	Костя	Косте	Sam	третьеклассник, лучший шифровальщик двора	a schoolboy, the best code-maker in his yard	hair=wood,cloth=roofB,cap
+pyotr	any	Пётр Ильич	Петру Ильичу	Mr Peter Ellis	вдовец, учится печь по письмам	a widower learning to bake by post	hair=grey,cloth=oak,moustache,apron
+daria	near:pyotr	Дарья	Дарье	Daisy	хозяйка таксы Бублика	owns a dachshund called Bagel	hair=honey,cloth=lilac,long
+lida	shop	Лида	Лиде	Lydia	продавщица в магазинчике на углу	works the till at the corner shop	hair=wood,cloth=enamel,apron,earrings
+oleg	any	Олег	Олегу	Owen	каждое утро берёт батон и кефир	buys a loaf and a pint of milk every morning	hair=dark,cloth=navy,glasses
+raisa	any	Раиса Петровна	Раисе Петровне	Mrs Rose Peters	огородница со стажем	a gardener of long standing	hair=grey,cloth=apple,kerchief=jam
+semyon	near:raisa	Семён Борисович	Семёну Борисовичу	Mr Simon Burrows	пенсионер, любит порядок	retired, fond of order	hair=grey,cloth=roofB,cap,glasses
+antonina	park	Антонина Сергеевна	Антонине Сергеевне	Mrs Antonia Sears	учительница математики на пенсии	a retired maths teacher	hair=grey,cloth=navy,bun,glasses
+klass	inst	3 «Б» класс	3 «Б» классу	Class 3B	школьный класс и их учительница	a primary class and their teacher	hair=honey,cloth=red,pigtails
+faina	any	Фаина Григорьевна	Фаине Григорьевне	Mrs Fay Gregory	старейшая жительница улицы, ей девяносто четыре	the oldest resident on the street, ninety-four	hair=grey,cloth=lilac,kerchief=cream,glasses
+marat	any	Марат	Марату	Mark	гуляет с овчаркой на рассвете	walks his sheepdog at dawn	hair=dark,cloth=autumn,beard
+lyuba	far:marat	Люба	Любе	Lucy	студентка, вечно всё теряет	a student who loses everything	hair=ginger,cloth=enamel,curls
+valentin	any	Валентин Петрович	Валентину Петровичу	Mr Valentine Pike	инженер, разбирает антресоли	an engineer clearing out his loft	hair=grey,cloth=green,glasses,beard
+margo	water	Маргарита Львовна	Маргарите Львовне	Mrs Margaret Lyle	сорок лет была школьным библиотекарем	a school librarian for forty years	hair=grey,cloth=jam,bun,glasses,earrings
+stepan	any	Степан Кузьмич	Степану Кузьмичу	Mr Stan Cousins	водитель трамвая на пенсии	a retired tram driver	hair=grey,cloth=oak,cap,moustache
+yasha	park	Яша	Яше	Jake	второклассник, знает все трамваи наизусть	a schoolboy who knows every tram by heart	hair=wood,cloth=apple,curls
+polina	water	Полина	Полине	Polly	рыбачка десяти лет	a ten-year-old angler	hair=honey,cloth=roofB,pigtails,cap
+larisa	any	Лариса Викторовна	Ларисе Викторовне	Mrs Laura Victor	следит за порядком во дворе	keeps an eye on the courtyard	hair=wood,cloth=honey,glasses,earrings
+gena	near:larisa	Геннадий Саввич	Геннадию Саввичу	Mr Gordon Sands	молчаливый пенсионер с ящиком инструментов	a quiet pensioner with a toolbox	hair=grey,cloth=enamel,cap,beard
+kirill	any	Кирилл	Кириллу	Chris	сам учится играть на трубе	teaching himself the trumpet	hair=ginger,cloth=green,curls
+ella	near:kirill	Элла Марковна	Элле Марковне	Mrs Ella Marks	учительница музыки на пенсии, абсолютный слух	a retired music teacher with perfect pitch	hair=grey,cloth=lilac,bun,earrings
+w_agata	any	Агата Ильинична	Агате Ильиничне	Mrs Agatha Ilford	живёт на пятом этаже без лифта	lives on the fifth floor, no lift	hair=grey,cloth=honey,bun,earrings
+w_dima	near:w_agata	Дима	Диме	Danny	курьер, ездит на велосипеде даже в снег	a courier who cycles even in the snow	hair=dark,cloth=autumn,cap
+w_sonya	park	Соня	Соне	Sophie	первоклассница, ждёт папу с вахты	a little girl waiting for her dad to come home from the rigs	hair=honey,cloth=red,pigtails
+w_anatoly	near:w_sonya	Анатолий Фомич	Анатолию Фомичу	Mr Anthony Foley	геолог на пенсии, борода лопатой	a retired geologist with a beard like a shovel	hair=grey,cloth=navy,beard
+w_efim	far:larisa	Ефим Борисович	Ефиму Борисовичу	Mr Ed Barnes	главный во дворе с голубятней	runs the yard with the dovecote	hair=grey,cloth=autumn,cap,moustache
+w_nadya	any	Надя	Наде	Nadia	купила квартиру вместе с напольными часами	bought a flat that came with a grandfather clock	hair=wood,cloth=cream,long
+w_seva	water	Всеволод Андреевич	Всеволоду Андреевичу	Mr Seymour Andrews	астроном-любитель, телескоп на балконе	an amateur astronomer with a telescope on his balcony	hair=grey,cloth=roofB,glasses,beard
+w_tonya	shop	Тоня	Тоне	Toni	пекарь, выходит на смену в четыре утра	a baker who starts her shift at four in the morning	hair=dark,cloth=cream,apron,bun
+w_ignat	near:lida	Игнат Романович	Игнату Романовичу	Mr Ian Rowe	живёт один и не любит кошек	lives alone and can't stand cats	hair=grey,cloth=oak,moustache,glasses
+w_kolya	any	Коля	Коле	Colin	восьмиклассник, давно мечтает о собаке	a schoolboy who has always wanted a dog	hair=wood,cloth=green,cap
+w_marfa	far:w_kolya	Марфа Тихоновна	Марфе Тихоновне	Mrs Martha Tickell	по утрам печёт сырники	makes cheese pancakes every morning	hair=grey,cloth=lilac,kerchief=apple
+w_ilya	park	Илья Захарович	Илье Захаровичу	Mr Elias Zane	сорок зим считает птиц у кормушки	has counted the birds at his feeder for forty winters	hair=grey,cloth=green,beard,cap
+w_inna	any	Инна Матвеевна	Инне Матвеевне	Mrs Irene Matthews	тридцать лет была телефонисткой, любит длинные письма	a switchboard operator for thirty years, fond of long letters	hair=grey,cloth=cream,bun,earrings
+w_gulya	any	Гуля	Гуле	Gulya	приехала с юга, первая настоящая зима	moved up from the south; her first real winter	hair=dark,cloth=honey,long,earrings
+w_zhora	near:semyon	Жора	Жоре	George	присматривает за бабушкиным попугаем	looks after his gran's parrot	hair=honey,cloth=enamel,curls,glasses
+w_tikhon	any	Тихон Ильич и Валентина Ивановна	Тихону Ильичу и Валентине Ивановне	Mr and Mrs Kemp	пятьдесят лет вместе, до сих пор спорят, кто кого первым заметил	fifty years married, still arguing over who noticed whom first	hair=grey,cloth=jam,glasses,moustache
+w_rimma	any	Римма Аркадьевна	Римме Аркадьевне	Mrs Rhona Archer	в семьдесят два начала учить французский	took up French at seventy-two	hair=grey,cloth=red,glasses,earrings
+w_alisa	near:w_rimma	Алиса	Алисе	Alice	десятиклассница, лучшая по французскому	a sixth-former, top of the class in French	hair=dark,cloth=lilac,long
+w_ruslan	any	Руслан	Руслану	Ross	отец троих, вечно ищет, где поставить машину	a father of three, forever hunting for a parking space	hair=dark,cloth=navy,beard
+w_german	near:w_ruslan	Герман Карлович	Герману Карловичу	Mr Herman Carr	сорок лет ставит машину на одно и то же место	has parked in the same spot for forty years	hair=grey,cloth=green,glasses,cap
+s_grisha	any	Гриша	Грише	Greg	программист, однажды засушил кактус	a programmer who once killed a cactus	hair=dark,cloth=green,glasses
+s_nikolay	any	Николай Петрович	Николаю Петровичу	Mr Nicholas Hale	пчеловод-любитель	an amateur beekeeper	hair=grey,cloth=honey,beard,cap
+s_kolya	far:s_nikolay	Коля	Коле	Nick	курьер на велосипеде, однофамилец Николая Петровича	a bicycle courier who shares Mr Hale's name	hair=wood,cloth=red,cap
+s_vadim	any	Вадим Степанович	Вадиму Степановичу	Mr Vincent Stokes	больше полувека женат на Татьяне Ивановне	married to Tanya for over fifty years	hair=grey,cloth=oak,cap
+s_doctor	near:polina	Михаил Захарович	Михаилу Захаровичу	Dr Michael Zane	детский врач на пенсии	a retired children's doctor	hair=grey,cloth=cream,glasses,beard
+s_zulya	shop	Зульфия	Зульфие	Zara	хозяйка маленькой пекарни	runs a little bakery	hair=dark,cloth=cream,apron,earrings
+s_ira	any	Ира	Ире	Iris	мама пятилетнего Тёмы	mum of five-year-old Tom	hair=honey,cloth=apple,long
+s_fomich	near:klass	Анатолий Фомич	Анатолию Фомичу	Mr Tony Foley	тридцать лет на школьной вахте	thirty years on the school front desk	hair=grey,cloth=navy,moustache,cap
+s_fedya	any	Федя	Феде	Freddie	басист гаражной группы «Сквозняк»	bass player in a garage band, the Draughts	hair=wood,cloth=autumn,long,beard
+s_tamara	any	Тамара Фёдоровна	Тамаре Фёдоровне	Mrs Tamsin Ford	в семьдесят лет встала на самокат	took up the scooter at seventy	hair=grey,cloth=lilac,curls,earrings
+s_alik	any	Алик	Алику	Alec	папа семилетней Сони, квартира № 12	Sonia's dad, flat 12	hair=wood,cloth=navy,beard
+s_sergey	near:s_alik	Сергей	Сергею	Serge	с детства живёт в доме напротив	has lived in the house opposite since he was a boy	hair=dark,cloth=oak,glasses
+s_ruslan	near:larisa	Руслан	Руслану	Ross	хозяин пустого балкона на пятом этаже	owner of an empty balcony on the fourth floor	hair=dark,cloth=roofB,cap
+a_lyudmila	any	Людмила Егоровна	Людмиле Егоровне	Mrs Millie Edgar	бабушка, которая волнуется за двоих	a grandmother who worries for two	hair=grey,cloth=lilac,glasses,kerchief=cream
+a_toma	far:zoya	Тамара Ильинична	Тамаре Ильиничне	Mrs Tilly Ince	дачница, варит варенье вёдрами	a weekend gardener who makes jam by the bucket	hair=wood,cloth=apple,kerchief=green,apron
+a_eduard	any	Эдуард Аполлонович	Эдуарду Аполлоновичу	Mr Edmund Ashby	актёр на пенсии, сорок лет на сцене	a retired actor, forty years on the stage	hair=grey,cloth=jam,moustache
+a_fedot	water	Федот Никитич	Федоту Никитичу	Mr Fred Nicholls	каждый день сидит с удочкой на набережной	sits on the embankment with a rod every day	hair=grey,cloth=oak,cap,beard
+a_vanya	near:a_fedot	Ваня	Ване	Johnny	пятиклассник, всё считает	a schoolboy who counts everything	hair=dark,cloth=apple,cap
+a_zhanna	near:larisa	Жанна	Жанне	Jean	мама двоих сорванцов, первый этаж	mother of two tearaways, ground floor	hair=dark,cloth=lilac,long
+a_irina	inst	Ирина Олеговна	Ирине Олеговне	Miss Irene Webb	молодая учительница первого класса	a young teacher with her first class	hair=honey,cloth=navy,long
+a_dima	any	Дима	Диме	Danny	четвероклассник, начинающий филателист	a schoolboy, a beginner stamp collector	hair=wood,cloth=roofB
+a_ilya	near:a_dima	Илья Матвеевич	Илье Матвеевичу	Mr Elias Matthews	собирает марки с шестидесятого года	has collected stamps since 1960	hair=grey,cloth=green,glasses
+a_tolya	any	Анатолий Ефимович	Анатолию Ефимовичу	Mr Tony Fenwick	грибник, считает белые	a mushroom hunter who counts his ceps	hair=grey,cloth=autumn,cap,moustache
+a_vasily	far:a_tolya	Василий Тихонович	Василию Тихоновичу	Mr Basil Tate	грибник, его вечный соперник	a mushroom hunter, his eternal rival	hair=grey,cloth=green,beard,glasses
+a_rodion	far:lev	Родион	Родиону	Rod	седьмой год строит лодку в гараже	has been building a boat in his garage for seven years	hair=ginger,cloth=enamel,beard
+a_pavel	any	Павел Андреевич	Павлу Андреевичу	Mr Patrick Ames	хозяин стремянки, которая всем нужна	owns the stepladder everyone needs	hair=grey,cloth=roofB,cap
+a_ruben	shop	Рубен	Рубену	Ruben	мастер по ремонту обуви и ключей	mends shoes and cuts keys	hair=dark,cloth=oak,apron,beard
+a_ksyusha	near:a_ruben	Ксюша	Ксюше	Ksyusha	девятиклассница, первая работа — разносить объявления	a schoolgirl whose first job is delivering leaflets	hair=ginger,cloth=apple,long
+a_vika	near:ella	Вика	Вике	Vicky	переезжает, а бабушкино пианино не влезает	moving house, and Gran's piano won't fit	hair=honey,cloth=jam,curls

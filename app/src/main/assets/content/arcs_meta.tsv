@@ -1,0 +1,61 @@
+arc	order	months	title_ru	title_en
+lev	1		Лев Аркадьевич и Нина Георгиевна	Mr Arden and Mrs Gale
+chess	2		Партия по переписке	A game of chess by post
+zoya	3		Зоя Михайловна и внучка	Mrs Michaels and her granddaughter
+owls	4		Тайные Совы	The Secret Owls
+baker	5		Клавин пирог	Clara's pie
+change	6		Батон и кефир	A loaf and a pint of milk
+pumpkin	7		Тыква через забор	The pumpkin over the fence
+teacher	8		Антонина Сергеевна и её ученики	Mrs Sears and her old pupils
+school	9		Наша улица раньше	Our street, back then
+glove	10		Варежка с оленями	The mitten with the reindeer
+library	11		Сорок лет «на руках»	Forty years on loan
+tram	12		Тысяча сорок третий	Tram 1043
+knots	13		Узлы по почте	Knots by post
+fixer	14		Кто чинит по ночам	Who fixes things at night
+trumpet	15		Ля, а не ля-бемоль	A, not A flat
+w_rink	16	12,1,2	Каток, второй круг	The rink, second time round
+w_parking	17		Место под липой	The spot under the lime
+w_tree	18	12	Ёлка на пятый этаж	A tree for the fifth floor
+w_clock	19	11,12	Двенадцать ударов	Twelve strokes
+w_frost	20	12	Дед Мороз из соседнего дома	Father Christmas next door
+w_stars	21		Звезда над пекарней	The star over the bakery
+w_cat	22	12,1	Гравитация	Gravity
+w_snowman	23	12,1,2	Двор на двор	Yard against yard
+w_dog	24		Барон Шурик Пельмень	Baron Sid Dumpling
+w_feeder	25	1,2	Совершенно научно	Strictly scientific
+w_penpal	26		Шёпот звёзд	The whisper of the stars
+w_sled	27	1,2	Ноги вперёд	Feet first
+w_parrot	28		Без осадков	No rain expected
+w_golden	29		Кто кого заметил	Who noticed whom
+w_lessons	30		Семьдесят два кота	Seventy-two cats
+s_annie	31	3,4	Аня едет в гости	Annie's coming to stay
+s_owls	32	4,5	Совы и скворечник	The Owls and the starling box
+s_seedlings	33	3,4	Семьдесят помидоров	Seventy tomatoes
+s_namesakes	34		Два Соколова	Two Mr Hales
+s_ring	35	3,4	Кольцо из-под снега	The ring under the snow
+s_rota	36		График для Бублика	A rota for Bagel
+s_bicycle	37	4,5	Рецепт: велосипед	Prescription: one bicycle
+s_bread	38		Хлеб без названия	The loaf with no name
+s_lilac	39	5	Пять лепестков	Five petals
+s_puzzle	40		Маяк на тысячу деталей	A thousand-piece lighthouse
+s_lastbell	41	5	Последний звонок	The last bell
+s_band	42		Гараж № 17	Garage No. 17
+s_scooter	43	5,6	Розовый шлем	The pink helmet
+s_secret	44		Секретик под тополем	The secret under the poplar
+s_balcony	45	5,6	Лучший балкон	Best balcony
+a_tourney	46	10,11	Первый турнир	The first tournament
+a_garden	47	6,7	Грядка у калитки	The bed by the gate
+a_camp	48	6,7	Шапку взял	Got my hat
+a_ladder	49		Где стремянка?	Where is the stepladder?
+a_jam	50	7,8	Банка на банку	Jar for jar
+a_actor	51		Пьеса «Лифт»	A play called The Lift
+a_fisher	52	7,8	Удочка без наживки	A rod without bait
+a_apples	53	8,9	Яблоня на спор	The apple tree on a bet
+a_firstday	54	9	Двадцать шесть букв «А»	Twenty-six As
+a_stamps	55		Конверт в конверте	An envelope in an envelope
+a_mushrooms	56	9,10	Тридцать два белых	Thirty-two ceps
+a_boat	57		Лодка шире ворот	A boat wider than the door
+a_leaflets	58		Первая зарплата	First wages
+a_piano	59		Пианино на площадке	A piano on the landing
+a_capsule	60		Вскрыть через двадцать пять лет	Open in twenty-five years

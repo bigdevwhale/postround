@@ -1,0 +1,101 @@
+sex	age	ru	dat_ru	en
+m	old	Пётр Ильич	Петру Ильичу	Mr Peters
+m	old	Аркадий Семёнович	Аркадию Семёновичу	Mr Simmons
+m	old	Виктор Павлович	Виктору Павловичу	Mr Victor Paul
+m	young	Олег	Олегу	Oliver
+m	young	Денис	Денису	Dan
+m	old	Борис Маркович	Борису Марковичу	Mr Marks
+m	young	Артём	Артёму	Arthur
+m	young	Фёдор	Фёдору	Fred
+f	old	Валентина Петровна	Валентине Петровне	Mrs Valentine
+f	young	Ольга	Ольге	Olga
+f	old	Тамара Ивановна	Тамаре Ивановне	Mrs Ives
+f	young	Света	Свете	Sally
+f	old	Римма Львовна	Римме Львовне	Mrs Lyons
+f	young	Алина	Алине	Alina
+f	old	Галина Сергеевна	Галине Сергеевне	Mrs Sargent
+f	young	Даша	Даше	Daisy
+m	old	Николай Степанович	Николаю Степановичу	Mr Stevens
+m	old	Геннадий Фёдорович	Геннадию Фёдоровичу	Mr Fielding
+m	old	Иван Кузьмич	Ивану Кузьмичу	Mr Cousins
+m	old	Семён Аркадьевич	Семёну Аркадьевичу	Mr Archer
+m	old	Леонид Яковлевич	Леониду Яковлевичу	Mr Jacobs
+m	old	Юрий Михайлович	Юрию Михайловичу	Mr Mitchell
+m	old	Анатолий Ильич	Анатолию Ильичу	Mr Ellis
+m	old	Василий Петрович	Василию Петровичу	Mr Pearce
+m	young	Максим	Максиму	Max
+m	young	Илья	Илье	Elliot
+m	young	Никита	Никите	Nick
+m	young	Кирилл	Кириллу	Kit
+m	young	Саша	Саше	Sam
+m	young	Егор	Егору	George
+m	young	Миша	Мише	Mike
+m	young	Паша	Паше	Paul
+m	young	Антон	Антону	Tony
+m	young	Вова	Вове	Will
+m	young	Роман	Роману	Rob
+m	young	Стас	Стасу	Stan
+m	young	Лёша	Лёше	Alex
+m	young	Игорь	Игорю	Ian
+m	young	Ваня	Ване	Jack
+m	young	Костя	Косте	Colin
+m	young	Женя	Жене	Gene
+m	young	Тимур	Тимуру	Toby
+m	young	Серёжа	Серёже	Steve
+f	old	Людмила Павловна	Людмиле Павловне	Mrs Pollard
+f	old	Антонина Фёдоровна	Антонине Фёдоровне	Mrs Fenwick
+f	old	Клавдия Ивановна	Клавдии Ивановне	Mrs Ivory
+f	old	Лидия Николаевна	Лидии Николаевне	Mrs Nicholls
+f	old	Вера Степановна	Вере Степановне	Mrs Stephens
+f	old	Зинаида Марковна	Зинаиде Марковне	Mrs Marlow
+f	old	Евдокия Савельевна	Евдокии Савельевне	Mrs Saville
+f	young	Катя	Кате	Kate
+f	young	Маша	Маше	Molly
+f	young	Настя	Насте	Nancy
+f	young	Лена	Лене	Ellie
+f	young	Юля	Юле	Julia
+f	young	Аня	Ане	Anna
+f	young	Ира	Ире	Irene
+f	young	Вика	Вике	Vicky
+f	young	Полина	Полине	Polly
+f	young	Соня	Соне	Sophie
+f	young	Наташа	Наташе	Natalie
+f	young	Лиза	Лизе	Liz
+f	young	Таня	Тане	Tania
+f	young	Ксюша	Ксюше	Kirsty
+f	young	Марина	Марине	Marina
+f	young	Варя	Варе	Barbara
+f	young	Яна	Яне	Jane
+f	young	Мила	Миле	Milly
+f	young	Люба	Любе	Lucy
+f	young	Рита	Рите	Rita
+m	old	Эдуард Борисович	Эдуарду Борисовичу	Mr Burton
+m	old	Григорий Матвеевич	Григорию Матвеевичу	Mr Matthews
+m	old	Степан Игнатьевич	Степану Игнатьевичу	Mr Ingram
+m	old	Михаил Фомич	Михаилу Фомичу	Mr Thomas
+m	old	Владимир Ефимович	Владимиру Ефимовичу	Mr Hemsley
+m	old	Павел Андреевич	Павлу Андреевичу	Mr Andrews
+m	old	Лев Дмитриевич	Льву Дмитриевичу	Mr Dennett
+f	old	Нина Аркадьевна	Нине Аркадьевне	Mrs Arkwright
+f	old	Мария Тимофеевна	Марии Тимофеевне	Mrs Timms
+f	old	Надежда Петровна	Надежде Петровне	Mrs Petty
+f	old	Елизавета Андреевна	Елизавете Андреевне	Mrs Drew
+f	old	Раиса Борисовна	Раисе Борисовне	Mrs Boyce
+f	old	Любовь Григорьевна	Любови Григорьевне	Mrs Gregory
+f	old	Ольга Матвеевна	Ольге Матвеевне	Mrs Mayhew
+m	young	Глеб	Глебу	Guy
+m	young	Матвей	Матвею	Matt
+m	young	Лёва	Лёве	Leo
+m	young	Дима	Диме	Danny
+m	young	Андрей	Андрею	Andy
+m	young	Гриша	Грише	Greg
+m	young	Петя	Пете	Pete
+m	young	Ярослав	Ярославу	Jerry
+f	young	Василиса	Василисе	Vanessa
+f	young	Алёна	Алёне	Helen
+f	young	Зоя	Зое	Zoe
+f	young	Нина	Нине	Nina
+f	young	Кира	Кире	Kerry
+f	young	Ульяна	Ульяне	Juliet
+f	young	Вера	Вере	Vera
+f	young	Галя	Гале	Gail

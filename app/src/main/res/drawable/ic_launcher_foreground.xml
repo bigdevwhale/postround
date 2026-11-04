@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- An envelope with a red wax seal: poste restante. Drawn on a 108 grid, pixel-style. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:fillColor="#FF22160F" android:pathData="M30,38h48v34h-48z" />
+    <path android:fillColor="#FFF8EED4" android:pathData="M33,41h42v28h-42z" />
+    <path android:fillColor="#FFD6C6A4" android:pathData="M33,41l21,16l21,-16v4l-21,16l-21,-16z" />
+    <path android:fillColor="#FF22160F" android:pathData="M33,69l15,-12h3l-15,12zM75,69l-15,-12h-3l15,12z" />
+    <path android:fillColor="#FFA33A2C" android:pathData="M50,55h8v8h-8z" />
+    <path android:fillColor="#FFEA8458" android:pathData="M51,56h3v3h-3z" />
+    <path android:fillColor="#FF2F4A80" android:pathData="M64,44h8v9h-8z" />
+    <path android:fillColor="#FFF4CC5A" android:pathData="M66,46h4v5h-4z" />
+</vector>
