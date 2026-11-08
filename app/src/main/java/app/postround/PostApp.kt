@@ -76,6 +76,9 @@ class AppContainer(context: Context) {
     val riding = MutableStateFlow(false)
     /** True while the app is on screen: handing-over then waits for a tap; in a pocket it happens by itself. */
     @Volatile var visible = false
+    /** When the current round began (wall-clock ms) and the day's distance at that moment, for the summary at its end. */
+    @Volatile var roundFrom = 0L
+    @Volatile var roundKm = 0.0
 
     private var lastFix: Geo? = null
     private var lastFixAt = 0L
@@ -261,7 +264,7 @@ class AppContainer(context: Context) {
         if (!visible && WalkService.running && !riding.value) {
             for (id in reachable(at)) {
                 val res = game.deliver(s, r, now, id) ?: continue
-                s.handed += Handed(now.day, id, res.shown.map { it.item })
+                s.handed += Handed(now.day, id, res.shown.map { it.item }, at = now.ms)
                 while (s.handed.size > 60) s.handed.removeAt(0)
                 notify(Notes.handed(this, res))
             }

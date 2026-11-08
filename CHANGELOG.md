@@ -6,6 +6,18 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.1.0]
+
+- The panel under the map folds away with a button at the top left of the map, and stays folded between launches; folded, it shows only the hand-over buttons, a telegram and a house you tap (#1).
+- The delivery log: every handing-over of the last seven days, house by house and with the time, with what the mail said and what was said at the door (#3). Open it from the map panel, the poste restante window or the morning sheet ("what was delivered yesterday").
+- When a round ends, by the button or from the notification, a summary of it: how much, to how many houses, how far, new stamps, and every house to read again (#2).
+
+<!-- tg
+Панель под картой теперь сворачивается: кнопка «Свернуть» в левом верхнем углу карты.
+Журнал вручений: кому и что вы вручили за последнюю неделю, с текстами писем и ответами жильцов.
+После обхода — короткая сводка: сколько разнесли, куда и что вам сказали.
+-->
+
 ## [1.0.0]
 
 The first version.

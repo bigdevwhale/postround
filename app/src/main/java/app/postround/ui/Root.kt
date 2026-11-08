@@ -49,6 +49,7 @@ import app.postround.ui.components.pixelBox
 import app.postround.ui.theme.C
 import app.postround.ui.theme.T
 import app.postround.work.Tracker
+import app.postround.work.WalkService
 import kotlinx.coroutines.delay
 
 /** What opens over the tabs. */
@@ -62,6 +63,8 @@ sealed interface Sheet {
     data class Stamp(val street: String) : Sheet
     data object Settings : Sheet
     data object Legend : Sheet
+    /** The delivery log of a day; with [from] > 0, the summary of the round that began then. */
+    data class Delivered(val day: Long, val from: Long = 0L) : Sheet
 }
 
 /** Tabs and the actions shared by the screens. */
@@ -76,6 +79,14 @@ fun Root() {
     var sheet by remember { mutableStateOf<Sheet?>(null) }
     LaunchedEffect(Unit) { c.wake(); c.refreshWeather() }
     LaunchedEffect(ver) { if (sheet == null && c.morning != null) sheet = Sheet.Morning }
+    // the round has just ended (by the button or from the notification): what was delivered on it
+    val walking by WalkService.walking.collectAsState()
+    var wasWalking by remember { mutableStateOf(walking) }
+    LaunchedEffect(walking) {
+        val s = c.state
+        if (wasWalking && !walking && sheet == null && s != null && c.roundFrom > 0 && s.delivered.any { it.at >= c.roundFrom }) sheet = Sheet.Delivered(s.day, c.roundFrom)
+        wasWalking = walking
+    }
     DisposableEffect(Unit) { val tr = Tracker.of(ctx); tr.start(); onDispose { tr.stop() } }
     ver.let { }
     if (c.state?.home == null || c.terrain == null && !c.store.hasDistrict()) { Onboarding(); return }
@@ -200,6 +211,7 @@ private fun SheetView(sh: Sheet, nav: Nav, close: () -> Unit) {
                     is Sheet.Stamp -> StampSheet(sh.street, nav, close)
                     is Sheet.Settings -> SettingsView()
                     is Sheet.Legend -> LegendSheet(close)
+                    is Sheet.Delivered -> DeliveredSheet(sh.day, sh.from, nav, close)
                 }
             }
         }

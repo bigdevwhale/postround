@@ -242,6 +242,7 @@ class Game(val c: Content) {
             if (it.kind == "pickup") s.done += 0 else s.done++
         }
         s.visited += houseId
+        s.journal(Handed(now.day, houseId, items, true, now.ms))
         s.today().handed += items.count { it.kind != "pickup" }
         var stamp: String? = null
         if (h.street !in s.streets) { s.streets[h.street] = now.day; s.today().streets++; stamp = h.street }
@@ -290,6 +291,7 @@ class Game(val c: Content) {
         val out = s.bag.filter { it.to == "post" }
         if (out.isEmpty()) return emptyList()
         s.bag.removeAll(out.toSet())
+        s.journal(Handed(now.day, "post", out, true, now.ms))
         return out.map { it ->
             s.done++; s.today().handed++
             val sh = show(s, it)
@@ -341,6 +343,7 @@ class Game(val c: Content) {
             s.riddles++; s.riddleTries = 0; s.done++; s.today().handed++
             s.riddleNext = now.day + 3
             s.visited += houseId
+            s.journal(Handed(now.day, houseId, listOf(it), true, now.ms))
             val last = s.riddles == 3
             if (last) { s.mine += Mine(now.day + 1, "somova"); s.belt = true }
             var stamp: String? = null

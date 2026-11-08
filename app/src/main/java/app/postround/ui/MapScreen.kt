@@ -179,6 +179,9 @@ fun MapScreen(nav: Nav) {
     val withMail = s.bag.filter { it.kind != "riddle" }.groupBy { it.to }
     val route = remember(ver, mx / 8, my / 8) { routeOf(c, mx.toFloat(), my.toFloat()) }
     val postXY = c.postXY()
+    // the block under the map can be folded away to see more of the map; remembered between launches
+    val prefs = remember { ctx.getSharedPreferences("ui", android.content.Context.MODE_PRIVATE) }
+    var folded by remember { mutableStateOf(prefs.getBoolean("panel_folded", false)) }
 
     Column(Modifier.fillMaxSize()) {
         BoxWithConstraints(Modifier.fillMaxWidth().weight(1f).clipToBounds()) {
@@ -345,8 +348,10 @@ fun MapScreen(nav: Nav) {
             }
             if (pan != IntOffset.Zero) PixelButton(w(ru, "К себе", "To me"), { pan = IntOffset.Zero }, Modifier.align(Alignment.TopEnd).padding(8.dp), Kind.GHOST)
             PixelButton("?", { nav.open(Sheet.Legend) }, Modifier.align(Alignment.BottomStart).padding(8.dp), Kind.GHOST)
+            PixelButton(if (folded) w(ru, "Развернуть", "Show panel") else w(ru, "Свернуть", "Hide panel"),
+                { folded = !folded; prefs.edit().putBoolean("panel_folded", folded).apply() }, Modifier.align(Alignment.TopStart).padding(8.dp), Kind.GHOST)
         }
-        ActionPanel(c, nav, me, route, walking, riding, sel)
+        ActionPanel(c, nav, me, route, walking, riding, sel, folded)
     }
 }
 
@@ -355,14 +360,15 @@ private fun pri(kind: String) = when (kind) { "telegram" -> 9; "pickup" -> 8; "o
 /** What can be done right here, in a compact block under the map. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ActionPanel(c: AppContainer, nav: Nav, me: Geo, route: List<House>, walking: Boolean, riding: Boolean, sel: String?) {
+private fun ActionPanel(c: AppContainer, nav: Nav, me: Geo, route: List<House>, walking: Boolean, riding: Boolean, sel: String?, folded: Boolean) {
     val ctx = LocalContext.current
     val ru = ru()
     val s = c.state ?: return; val r = c.round ?: return; val d = c.district ?: return
     val mx = d.x(me.lon); val my = d.y(me.lat)
     val reach = c.reachable(me)
-    Column(Modifier.fillMaxWidth().heightIn(max = 330.dp).verticalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-        Row(verticalAlignment = Alignment.Bottom) {
+    Column(Modifier.fillMaxWidth().heightIn(max = 330.dp).verticalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = if (folded) 4.dp else 8.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+        // folded: only what has to be acted on here and now — the hand-over buttons, a telegram, a house just tapped
+        if (!folded) Row(verticalAlignment = Alignment.Bottom) {
             Text(placeName(c, me, ru), style = T.Heading, modifier = Modifier.weight(1f), maxLines = 1)
             val steps = s.log.firstOrNull { it.day == s.day }?.steps ?: -1
             Text(w(ru, "сегодня ", "today ") + km(maxOf(s.kmToday, if (steps > 0) steps * 0.00072 else 0.0), ru) + if (steps >= 0) " · " + "%,d".format(steps).replace(',', ' ') + w(ru, " шагов", " steps") else "", style = T.Small)
@@ -395,7 +401,7 @@ private fun ActionPanel(c: AppContainer, nav: Nav, me: Geo, route: List<House>, 
         }
         // the picked house, or the next stop of the route
         val pick = sel?.let { r.byId[it] }
-        val target = pick ?: route.firstOrNull()
+        val target = pick ?: route.firstOrNull()?.takeIf { !folded }
         if (target != null) {
             val items = s.bag.filter { it.to == target.id && it.kind != "riddle" }
             val m = r.metresDoor(target, mx, my)
@@ -421,16 +427,20 @@ private fun ActionPanel(c: AppContainer, nav: Nav, me: Geo, route: List<House>, 
                     }
                 }
             }
-        } else if (s.bag.isEmpty()) {
+        } else if (s.bag.isEmpty() && !folded) {
             Text(w(ru, "Сумка пуста. Завтра утром будет новая.", "The bag is empty. A new one comes in the morning."), style = T.Body)
         }
+        if (folded) return@Column
         if (route.size > 1) {
             var len = 0.0; var px = mx; var py = my
             route.forEach { h -> len += hypot((h.doorX - px).toDouble(), (h.doorY - py).toDouble()) * d.mpp; px = h.doorX.toFloat(); py = h.doorY.toFloat() }
             Text(w(ru, "Маршрут на сегодня: ${route.size} ${plural(route.size, "адрес", "адреса", "адресов")} · около ${dist(len, true)}", "Today's route: ${route.size} addresses · about ${dist(len, false)}"), style = T.Small)
         }
-        s.handed.filter { !it.seen }.takeIf { it.isNotEmpty() }?.let { list ->
-            PixelButton(w(ru, "Что сказали по дороге · ${list.size}", "What they said on the way · ${list.size}"), { nav.open(Sheet.Pocket(list)) }, Modifier.fillMaxWidth(), Kind.GHOST)
+        val pocket = s.handed.filter { !it.seen }
+        val today = s.delivered.filter { it.day == s.day }.sumOf { h -> h.items.count { it.kind != "pickup" } }
+        if (pocket.isNotEmpty() || today > 0) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (pocket.isNotEmpty()) PixelButton(w(ru, "Что сказали · ${pocket.size}", "What they said · ${pocket.size}"), { nav.open(Sheet.Pocket(pocket)) }, Modifier.weight(1f), Kind.GHOST)
+            if (today > 0) PixelButton(w(ru, "Разнесено · $today", "Delivered · $today"), { nav.open(Sheet.Delivered(s.day)) }, Modifier.weight(1f), Kind.GHOST)
         }
         PixelButton(if (walking) w(ru, "Закончить обход", "End the round") else w(ru, "Выйти на обход", "Start the round"),
             { if (walking) WalkService.stop(ctx) else WalkService.start(ctx) }, Modifier.fillMaxWidth(), if (walking) Kind.GHOST else Kind.PRIMARY)

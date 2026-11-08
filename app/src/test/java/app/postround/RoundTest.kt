@@ -67,5 +67,10 @@ class RoundTest {
         assertTrue(s.belt)
         assertTrue("stories finish", s.arcDone.size >= 15)
         assertTrue(s.bag.none { it.to.isBlank() })
+        // the delivery log keeps the last week, every day's handing-over in it
+        val days = s.delivered.map { it.day }.distinct()
+        assertTrue("log keeps a week: $days", days.size in 5..GameState.JOURNAL_DAYS && days.all { it > s.day - GameState.JOURNAL_DAYS })
+        val last = s.log.first { it.day == s.day - 1 }
+        assertEquals(last.handed, s.delivered.filter { it.day == last.day }.sumOf { h -> h.items.count { it.kind != "pickup" } })
     }
 }

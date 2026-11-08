@@ -194,6 +194,20 @@ fun WindowScreen(nav: Nav) {
                 }
             }
         }
+        item {
+            val list = s.delivered.filter { it.day == s.day }
+            val n = list.sumOf { h -> h.items.count { it.kind != "pickup" } }
+            Panel(Modifier.fillMaxWidth(), fill = C.light, onClick = { nav.open(Sheet.Delivered(s.day)) }) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    BufImage(MailIcons.of("parcel"), Modifier.padding(end = 10.dp), 3.dp)
+                    Column(Modifier.weight(1f)) {
+                        Text(w(ru, "Журнал вручений", "The delivery log"), style = T.Body)
+                        Text(if (n > 0) w(ru, "Сегодня вручено ${countItems(n, true)} — кому и что", "Today: ${countItems(n, false)} — to whom and what")
+                             else w(ru, "Кому и что вы вручили за последние дни", "Who you delivered what to, these last days"), style = T.Small)
+                    }
+                }
+            }
+        }
         val letters = s.mine.filter { it.day <= s.day }.reversed()
         item { Eyebrow(w(ru, "письма почтальону", "letters to the postman"), Modifier.padding(top = 4.dp)) }
         if (letters.isEmpty()) item { Text(w(ru, "Пока пусто. Жильцы пишут почтальону, когда их переписка доходит до конца.", "Nothing yet. People write to the postman when their correspondence comes to an end."), style = T.Small) }

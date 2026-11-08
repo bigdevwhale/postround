@@ -81,7 +81,10 @@ class WalkService : Service() {
         val type = if (Build.VERSION.SDK_INT >= 29) ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION else 0
         val ok = runCatching { ServiceCompat.startForeground(this, ID, note(), type) }.isSuccess
         if (!ok) { stopSelf(); return START_NOT_STICKY }
-        if (!running) { running = true; walking.value = true; Tracker.of(this).start() }
+        if (!running) {
+            container.roundFrom = System.currentTimeMillis(); container.roundKm = container.state?.kmToday ?: 0.0
+            running = true; walking.value = true; Tracker.of(this).start()
+        }
         return START_NOT_STICKY
     }
 

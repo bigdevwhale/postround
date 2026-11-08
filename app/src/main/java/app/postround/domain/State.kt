@@ -38,11 +38,17 @@ class Mine(val day: Long, val arc: String, var read: Boolean = false) {
     companion object { fun of(o: JSONObject) = Mine(o.getLong("d"), o.getString("a"), o.optBoolean("r")) }
 }
 
-/** A handing-over made with the phone in a pocket: shown as a card when the app opens. */
-class Handed(val day: Long, val house: String, val items: List<Item>, var seen: Boolean = false) {
-    fun toJson(): JSONObject = JSONObject().put("d", day).put("h", house).put("i", JSONArray(items.map { it.toJson() })).put("s", seen)
+/**
+ * A handing-over at one door ([house] is a house id, or "post" for the post office), at wall-clock time [at].
+ * Kept twice: in [GameState.handed] when it was made with the phone in a pocket (a card to read later),
+ * and in [GameState.delivered], the journal of the last days.
+ */
+class Handed(val day: Long, val house: String, val items: List<Item>, var seen: Boolean = false, val at: Long = 0L) {
+    /** A telegram handed after its deadline. */
+    fun late(it: Item) = it.kind == "telegram" && it.due > 0 && at > it.due
+    fun toJson(): JSONObject = JSONObject().put("d", day).put("h", house).put("i", JSONArray(items.map { it.toJson() })).put("s", seen).put("at", at)
     companion object {
-        fun of(o: JSONObject) = Handed(o.getLong("d"), o.getString("h"), o.getJSONArray("i").let { a -> List(a.length()) { Item.of(a.getJSONObject(it)) } }, o.optBoolean("s"))
+        fun of(o: JSONObject) = Handed(o.getLong("d"), o.getString("h"), o.getJSONArray("i").let { a -> List(a.length()) { Item.of(a.getJSONObject(it)) } }, o.optBoolean("s"), o.optLong("at"))
     }
 }
 
@@ -77,6 +83,8 @@ class GameState {
     val visited = HashSet<String>()
     val mine = ArrayList<Mine>()
     val handed = ArrayList<Handed>()
+    /** Everything handed over in the last [JOURNAL_DAYS] days, in order: the day's history and the summary after a round. */
+    val delivered = ArrayList<Handed>()
     val gifts = ArrayList<String>()
     val log = ArrayList<DayLog>()
     /** The houses that take the evening paper. */
@@ -103,6 +111,13 @@ class GameState {
     val tgUsed = HashSet<Int>()
     val paperUsed = HashSet<Int>()
 
+    /** Writes a handing-over into the journal, dropping the days that have gone out of it. */
+    fun journal(h: Handed) {
+        delivered += h
+        delivered.removeAll { it.day <= h.day - JOURNAL_DAYS }
+        while (delivered.size > 400) delivered.removeAt(0)
+    }
+
     fun today(): DayLog = log.lastOrNull()?.takeIf { it.day == day } ?: DayLog(day).also { log += it; while (log.size > 40) log.removeAt(0) }
 
     fun toJson(): JSONObject {
@@ -116,6 +131,7 @@ class GameState {
         o.put("threads", JSONArray(threads.map { JSONArray().put(it.first).put(it.second) }))
         o.put("streets", JSONObject(streets as Map<*, *>)).put("visited", JSONArray(visited.toList()))
         o.put("mine", JSONArray(mine.map { it.toJson() })).put("handed", JSONArray(handed.map { it.toJson() }))
+        o.put("delivered", JSONArray(delivered.map { it.toJson() }))
         o.put("gifts", JSONArray(gifts)).put("log", JSONArray(log.map { it.toJson() })).put("subs", JSONArray(subs))
         o.put("paperN", paperN).put("chessToday", chessToday).put("done", done).put("tgOk", tgOk).put("tgAll", tgAll).put("tgDay", tgDay)
         o.put("km", km).put("kmToday", kmToday).put("riddles", riddles).put("riddleTries", riddleTries).put("riddleNext", riddleNext)
@@ -125,6 +141,7 @@ class GameState {
     }
 
     companion object {
+        const val JOURNAL_DAYS = 7
         fun fromJson(o: JSONObject): GameState = GameState().apply {
             o.optJSONArray("home")?.let { home = Geo(it.getDouble(0), it.getDouble(1)) }
             o.optJSONArray("box")?.let { a -> box = DoubleArray(a.length()) { a.getDouble(it) } }
@@ -140,6 +157,7 @@ class GameState {
             o.optJSONArray("visited")?.let { a -> for (i in 0 until a.length()) visited += a.getString(i) }
             o.optJSONArray("mine")?.let { a -> for (i in 0 until a.length()) mine += Mine.of(a.getJSONObject(i)) }
             o.optJSONArray("handed")?.let { a -> for (i in 0 until a.length()) handed += Handed.of(a.getJSONObject(i)) }
+            o.optJSONArray("delivered")?.let { a -> for (i in 0 until a.length()) delivered += Handed.of(a.getJSONObject(i)) }
             o.optJSONArray("gifts")?.let { a -> for (i in 0 until a.length()) gifts += a.getString(i) }
             o.optJSONArray("log")?.let { a -> for (i in 0 until a.length()) log += DayLog.of(a.getJSONObject(i)) }
             o.optJSONArray("subs")?.let { a -> for (i in 0 until a.length()) subs += a.getString(i) }

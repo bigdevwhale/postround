@@ -1,5 +1,6 @@
 package app.postround.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -22,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import app.postround.AppContainer
 import app.postround.container
 import app.postround.domain.Asked
+import app.postround.domain.GameState
 import app.postround.domain.Handed
 import app.postround.domain.House
 import app.postround.domain.Mine
@@ -184,6 +188,7 @@ fun MorningSheet(nav: Nav, close: () -> Unit) {
         else -> w(ru, "Погода — гуляй не хочу. Ну, идите.", "Lovely day for it. Off you go.")
     }, style = T.Body, modifier = Modifier.padding(top = 8.dp))
     Spacer(Modifier.height(12.dp))
+    if (s.delivered.any { it.day == s.day - 1 }) PixelButton(w(ru, "Что вручили вчера", "What was delivered yesterday"), { close(); nav.open(Sheet.Delivered(s.day - 1)) }, Modifier.fillMaxWidth().padding(bottom = 8.dp), Kind.GHOST)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         PixelButton(w(ru, "На участок", "Out on the round"), close, Modifier.weight(1f), Kind.LAMP)
         if (unread > 0) PixelButton(w(ru, "Окошко", "The window"), { close(); nav.tab(3) }, kind = Kind.GHOST)
@@ -212,6 +217,97 @@ fun PocketSheet(list: List<Handed>, close: () -> Unit) {
         h.seen = true; c.changed()
         if (i + 1 < list.size) i++ else close()
     }, Modifier.fillMaxWidth(), Kind.LAMP)
+}
+
+/** "8 ноября" / "November 8". */
+fun dayName(day: Long, ru: Boolean): String {
+    val d = java.time.LocalDate.ofEpochDay(day)
+    val months = if (ru) listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
+    else listOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+    return if (ru) "${d.dayOfMonth} ${months[d.monthValue - 1]}" else "${months[d.monthValue - 1]} ${d.dayOfMonth}"
+}
+
+/** The days the journal holds, oldest first; today is always there. */
+private fun journalDays(s: GameState): List<Long> = (s.delivered.map { it.day } + s.day).filter { it > s.day - GameState.JOURNAL_DAYS }.distinct().sorted()
+
+/**
+ * What was handed over in a day, house by house, with what each piece said and what was said at the door.
+ * With [from] > 0 it is the summary of the round that began then: only what was handed since.
+ */
+@Composable
+fun DeliveredSheet(day0: Long, from: Long, nav: Nav, close: () -> Unit) {
+    val c = LocalContext.current.container
+    val ru = ru()
+    val s = c.state ?: return
+    val r = c.round ?: return
+    var day by remember { mutableLongStateOf(day0) }
+    var open by remember { mutableStateOf<Int?>(null) }
+    val round = from > 0
+    val list = s.delivered.filter { if (round) it.at >= from else it.day == day }
+    val items = list.flatMap { it.items }
+    if (round) {
+        Eyebrow(w(ru, "обход окончен", "the round is over"))
+        Text(w(ru, "Что вы разнесли", "What you delivered"), style = T.Title, modifier = Modifier.padding(top = 2.dp))
+    } else {
+        Eyebrow(w(ru, "журнал вручений", "the delivery log"))
+        val days = journalDays(s)
+        val i = days.indexOf(day)
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
+            PixelButton("<", { if (i > 0) { day = days[i - 1]; open = null } }, kind = Kind.GHOST, enabled = i > 0)
+            Text(when (s.day - day) { 0L -> w(ru, "Сегодня", "Today"); 1L -> w(ru, "Вчера", "Yesterday"); else -> dayName(day, ru) },
+                style = T.Title, modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            PixelButton(">", { if (i in 0 until days.size - 1) { day = days[i + 1]; open = null } }, kind = Kind.GHOST, enabled = i in 0 until days.size - 1)
+        }
+    }
+    // the summary: how much, how far, what kinds
+    val n = items.count { it.kind != "pickup" }
+    val houses = list.map { it.house }.filter { it != "post" }.distinct().size
+    val walked = if (round) (s.kmToday - c.roundKm).takeIf { s.day == day0 }?.coerceAtLeast(0.0) else s.log.firstOrNull { it.day == day }?.walked
+    val stamps = if (round) list.mapNotNull { h -> r.byId[h.house]?.street }.distinct().count { st -> s.streets[st] == day0 && s.delivered.none { o -> o.at < from && r.byId[o.house]?.street == st } }
+                 else s.log.firstOrNull { it.day == day }?.streets ?: 0
+    if (list.isEmpty()) {
+        Text(if (round) w(ru, "За этот обход ничего не вручено.", "Nothing was delivered on this round.") else w(ru, "В этот день ничего не вручали.", "Nothing was delivered that day."),
+            style = T.Body, modifier = Modifier.padding(top = 10.dp))
+        walked?.takeIf { it > .05 }?.let { Text(w(ru, "Пройдено ", "Walked ") + km(it, ru) + ".", style = T.Small) }
+    } else {
+        Text(w(ru, "Вручено ${countItems(n, true)}", "${countItems(n, false).replaceFirstChar { it.uppercase() }} delivered") +
+            (if (houses > 0) w(ru, " в $houses ${plural(houses, "дом", "дома", "домов")}", " to $houses house" + if (houses == 1) "" else "s") else "") +
+            (walked?.takeIf { it > .05 }?.let { w(ru, ", пройдено ", ", ") + km(it, ru) + w(ru, "", " walked") } ?: "") +
+            (if (stamps > 0) w(ru, ", новых марок: $stamps", ", $stamps new stamp" + if (stamps == 1) "" else "s") else "") + ".",
+            style = T.Body, modifier = Modifier.padding(top = 8.dp))
+        val kinds = items.groupingBy { kindName(it.kind, ru) }.eachCount()
+        Text(kinds.entries.joinToString(", ") { "${it.key} ×${it.value}" }, style = T.Small)
+        val replies = items.count { it.arc.isNotEmpty() && it.kind != "out" }
+        if (replies > 0) Text(w(ru, "Из них в переписках: $replies.", "Of them, in correspondences: $replies."), style = T.Small)
+        Text(w(ru, "Нажмите на дом — покажу, что было в письмах и что сказали.", "Tap a house to see what the mail said and what was said at the door."),
+            style = T.Small.copy(color = C.muted), modifier = Modifier.padding(top = 6.dp))
+    }
+    list.forEachIndexed { k, h ->
+        val house = r.byId[h.house]
+        val post = h.house == "post"
+        val expanded = open == k
+        Column(Modifier.fillMaxWidth().padding(top = 8.dp).pixelBox(if (expanded) C.paper else C.light, bevel = null).clickable { open = if (expanded) null else k }.padding(horizontal = 10.dp, vertical = 8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    val title = when { post -> w(ru, "Почта", "The post office"); house != null -> house.addr(ru); else -> "—" }
+                    Text((if (h.at > 0) hhmm(h.at) + " · " else "") + title, style = T.Body, maxLines = 1)
+                    val who = when { post -> w(ru, "Галина, отправка посылок", "Galina, parcels out"); house != null -> c.game.resident(s, house).let { it.name(ru) + " · " + it.role(ru) }; else -> "" }
+                    if (who.isNotEmpty()) Text(who, style = T.Small, maxLines = 1)
+                }
+                for (it in h.items.distinctBy { it.kind }) BufImage(MailIcons.of(it.kind), Modifier.padding(start = 4.dp), 1.5.dp)
+            }
+            if (expanded) {
+                h.items.forEach { ShownBlock(c.game.show(s, it, h.late(it)), ru, c) }
+                if (house != null) PixelButton(w(ru, "На карте", "On the map"), { close(); nav.show(house.id) }, Modifier.padding(top = 8.dp), Kind.GHOST)
+            }
+        }
+    }
+    Spacer(Modifier.height(12.dp))
+    val pocket = s.handed.filter { !it.seen }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (pocket.isNotEmpty()) PixelButton(w(ru, "По порядку · ${pocket.size}", "One by one · ${pocket.size}"), { nav.open(Sheet.Pocket(pocket)) }, Modifier.weight(1f), Kind.GHOST)
+        PixelButton(w(ru, "Закрыть", "Close"), close, Modifier.weight(1f), Kind.LAMP)
+    }
 }
 
 @Composable
