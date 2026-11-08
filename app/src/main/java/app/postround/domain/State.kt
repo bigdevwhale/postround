@@ -27,6 +27,9 @@ class Item(
 
     fun copy(id: Long = this.id, arrive: Long = this.arrive) = Item(id, kind, to, arc, st, v, due, arrive)
 
+    /** The same piece of mail for another door. */
+    fun readdressed(to: String) = Item(id, kind, to, arc, st, v, due, arrive)
+
     companion object {
         fun of(o: JSONObject) = Item(o.getLong("id"), o.getString("k"), o.optString("to"), o.optString("a"), o.optInt("s", -1), o.optInt("v"), o.optLong("due"), o.optLong("ar"))
     }
@@ -79,6 +82,8 @@ class GameState {
     val threads = ArrayList<Pair<String, String>>()
     /** Street → the day of its first handing-over (its stamp). */
     val streets = LinkedHashMap<String, Long>()
+    /** Houses the postman can't get near (a factory, a fenced yard): no mail goes there (#4). */
+    val closed = LinkedHashSet<String>()
     /** Houses ever handed something, for the map's little marks. */
     val visited = HashSet<String>()
     val mine = ArrayList<Mine>()
@@ -129,7 +134,7 @@ class GameState {
         o.put("arcs", JSONObject(arcs as Map<*, *>)).put("arcDone", JSONArray(arcDone.toList())).put("nextArcDay", nextArcDay)
         o.put("cast", JSONObject(cast as Map<*, *>))
         o.put("threads", JSONArray(threads.map { JSONArray().put(it.first).put(it.second) }))
-        o.put("streets", JSONObject(streets as Map<*, *>)).put("visited", JSONArray(visited.toList()))
+        o.put("streets", JSONObject(streets as Map<*, *>)).put("visited", JSONArray(visited.toList())).put("closed", JSONArray(closed.toList()))
         o.put("mine", JSONArray(mine.map { it.toJson() })).put("handed", JSONArray(handed.map { it.toJson() }))
         o.put("delivered", JSONArray(delivered.map { it.toJson() }))
         o.put("gifts", JSONArray(gifts)).put("log", JSONArray(log.map { it.toJson() })).put("subs", JSONArray(subs))
@@ -155,6 +160,7 @@ class GameState {
             o.optJSONArray("threads")?.let { a -> for (i in 0 until a.length()) a.getJSONArray(i).let { p -> threads += p.getString(0) to p.getString(1) } }
             o.optJSONObject("streets")?.let { a -> a.keys().forEach { streets[it] = a.getLong(it) } }
             o.optJSONArray("visited")?.let { a -> for (i in 0 until a.length()) visited += a.getString(i) }
+            o.optJSONArray("closed")?.let { a -> for (i in 0 until a.length()) closed += a.getString(i) }
             o.optJSONArray("mine")?.let { a -> for (i in 0 until a.length()) mine += Mine.of(a.getJSONObject(i)) }
             o.optJSONArray("handed")?.let { a -> for (i in 0 until a.length()) handed += Handed.of(a.getJSONObject(i)) }
             o.optJSONArray("delivered")?.let { a -> for (i in 0 until a.length()) delivered += Handed.of(a.getJSONObject(i)) }

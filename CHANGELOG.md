@@ -6,6 +6,16 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.2.0] - 2026-11-08
+
+- **«Can't get to this house»** on a house's card: no more mail goes there, and what was due goes to a neighbour. Houses inside works, railway yards, military land and garage rows are left out of the round by themselves (#4).
+- **Moving house:** Settings → «Move here» draws the round again around where you stand. Stories, street stamps, the journal and the Poste Restante letters stay; the people of the stories, the paper's subscribers and the mail in the bag find new houses (#5).
+
+<!-- tg
+Если к дому не подойти, его можно отметить «Сюда не пройти» – письма туда больше не пойдут, а заводы и закрытые территории исключаются сами.
+Переехали? Настройки → «Переехать сюда»: участок нарисуется заново, а истории, марки и журнал останутся.
+-->
+
 ## [1.1.0]
 
 - The panel under the map folds away with a button at the top left of the map, and stays folded between launches; folded, it shows only the hand-over buttons, a telegram and a house you tap (#1).

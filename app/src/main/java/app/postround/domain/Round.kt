@@ -65,6 +65,8 @@ class Round(val d: District, val t: Terrain) {
             if (num.isEmpty() || num.length > 12) continue
             val b = blockAt(a.x, a.y) ?: continue
             if (b.index in taken || b.area < 12) continue
+            // inside works, a railway yard or military land: no door the postman can reach (#4)
+            if (d.shut.any { inside(it, b.cx, b.cy) }) continue
             val street = parts[0].ifBlank { nearestStreet(b.cx, b.cy) ?: continue }
             val id = "$street|$num"
             if (id in out) continue
@@ -168,6 +170,20 @@ class Round(val d: District, val t: Terrain) {
         val SHOPS = setOf("retail", "commercial", "kiosk", "supermarket", "shop")
         val INST = setOf("school", "kindergarten", "university", "college", "office", "public", "civic", "government", "hospital")
         val SKIP = setOf("garage", "garages", "shed", "hut", "roof", "carport", "service", "industrial", "warehouse", "construction", "ruins", "transformer_tower", "bunker", "ship")
+
+        /** Whether (x, y) lies inside the outer ring of [p]. */
+        fun inside(p: app.postround.data.Poly, x: Float, y: Float): Boolean {
+            val r = p.rings.firstOrNull() ?: return false
+            var inside = false
+            var j = r.size - 2
+            var i = 0
+            while (i + 1 < r.size) {
+                val xi = r[i]; val yi = r[i + 1]; val xj = r[j]; val yj = r[j + 1]
+                if ((yi > y) != (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside
+                j = i; i += 2
+            }
+            return inside
+        }
 
         fun strHash(s: String): Long { var h = 7L; for (c in s) h = (h * 31 + c.code) and 0xffffffffL; return h }
 

@@ -427,6 +427,15 @@ private fun ActionPanel(c: AppContainer, nav: Nav, me: Geo, route: List<House>, 
                     }
                 }
             }
+            // A house behind a fence or inside works: no more mail for it, what was due goes to a neighbour (#4).
+            if (pick != null) {
+                var sure by remember(pick.id) { mutableStateOf(false) }
+                if (pick.id in s.closed) PixelButton(w(ru, "Снова носить сюда почту", "Deliver here again"), { c.reopenHouse(pick.id) }, Modifier.fillMaxWidth(), Kind.GHOST)
+                else PixelButton(
+                    if (sure) w(ru, "Точно? Письма переадресуем соседям", "Sure? Its mail goes to the neighbours") else w(ru, "Сюда не пройти", "Can't get to this house"),
+                    { if (sure) c.closeHouse(pick.id) else sure = true }, Modifier.fillMaxWidth(), Kind.GHOST,
+                )
+            }
         } else if (s.bag.isEmpty() && !folded) {
             Text(w(ru, "Сумка пуста. Завтра утром будет новая.", "The bag is empty. A new one comes in the morning."), style = T.Body)
         }

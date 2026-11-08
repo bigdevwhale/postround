@@ -73,4 +73,26 @@ class RoundTest {
         val last = s.log.first { it.day == s.day - 1 }
         assertEquals(last.handed, s.delivered.filter { it.day == last.day }.sumOf { h -> h.items.count { it.kind != "pickup" } })
     }
+    /** A shut house and a move (#4, #5): every person and piece of mail lands on a door the postman can reach. */
+    @Test
+    fun rehome() {
+        val r = round()
+        val g = Game(content)
+        val today = LocalDate.of(2026, 10, 1)
+        val s = g.newGame(DemoSeed.HOME, Now(today))
+        DemoSeed.play(g, s, r, today.plusDays(20), 20)
+        val home = s.cast.values.first()
+        g.close(s, r, home)
+        assertTrue(home !in s.cast.values)
+        assertTrue(s.bag.all { g.reachableDoor(s, r, it.to) })
+        assertTrue(s.subs.all { g.reachableDoor(s, r, it) })
+        // a move: the old houses are unknown on the new map, so all of them find new ones
+        val stories = s.arcs.toMap()
+        s.cast.keys.toList().forEach { s.cast[it] = "Nowhere|0" }
+        s.bag.replaceAll { it.readdressed(if (it.to == "post") "post" else "Nowhere|0") }
+        g.rehome(s, r)
+        assertTrue(s.cast.values.all { r.byId[it] != null })
+        assertTrue(s.bag.all { g.reachableDoor(s, r, it.to) })
+        assertEquals(stories, s.arcs.toMap())
+    }
 }

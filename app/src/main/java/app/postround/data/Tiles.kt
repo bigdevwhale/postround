@@ -23,6 +23,9 @@ import kotlin.math.tan
  * people at a browser and turns automated requests away when busy.
  */
 object Tiles {
+    /** Landuse a postman doesn't walk into, from the OpenMapTiles schema (#4). */
+    private val SHUT = setOf("industrial", "military", "railway", "garages", "quarry")
+
     const val Z = 14
     private const val AGENT = "Postround/1.0 (github.com/bigdevwhale/postround)"
     private const val TILEJSON = "https://tiles.openfreemap.org/planet"
@@ -77,7 +80,7 @@ object Tiles {
     fun parse(blob: ByteArray, box: DoubleArray, mpp: Double = 1.6): District {
         val empty = District(box[0], box[1], box[2], box[3], mpp, emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList())
         val buildings = ArrayList<Building>(); val roads = ArrayList<Road>(); val water = ArrayList<Poly>()
-        val greens = ArrayList<Green>(); val places = ArrayList<Spot>(); val addrs = ArrayList<Spot>()
+        val greens = ArrayList<Green>(); val places = ArrayList<Spot>(); val addrs = ArrayList<Spot>(); val shut = ArrayList<Poly>()
         DataInputStream(ByteArrayInputStream(blob)).use { inp ->
             inp.readInt()
             val n = inp.readInt()
@@ -105,6 +108,7 @@ object Tiles {
                             "landuse" -> {
                                 val k = when (tags["class"]) { "pitch", "stadium" -> "pitch"; "playground" -> "play"; "zoo", "theme_park" -> "park"; else -> null }
                                 if (k != null) polys(parts).forEach { greens += Green(k, it) }
+                                if (tags["class"] in SHUT) polys(parts).forEach { shut += it }
                             }
                             "transportation" -> if (f.type == 2) {
                                 val type = roadType(tags) ?: continue
@@ -134,7 +138,7 @@ object Tiles {
         // the tiles reach past the district: keep only places inside it, so nobody settles beyond the edge of the map
         places.removeAll { it.x < 0 || it.y < 0 || it.x > empty.w || it.y > empty.h }
         addrs.removeAll { it.x < 0 || it.y < 0 || it.x > empty.w || it.y > empty.h }
-        return District(box[0], box[1], box[2], box[3], mpp, buildings, roads, water, greens, emptyList(), emptyList(), places, addrs)
+        return District(box[0], box[1], box[2], box[3], mpp, buildings, roads, water, greens, emptyList(), emptyList(), places, addrs, shut)
     }
 
     /** MVT polygons: a ring with positive area starts a polygon, negative ones are its holes. */

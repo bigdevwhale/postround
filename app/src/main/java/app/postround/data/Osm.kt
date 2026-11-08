@@ -32,6 +32,8 @@ class District(
     val places: List<Spot>,
     /** House numbers: kind "addr", name "street|number" (the street may be empty: tiles give the number only). */
     val addrs: List<Spot> = emptyList(),
+    /** Ground a postman doesn't walk into: works, railway yards, military land, garage rows (#4). */
+    val shut: List<Poly> = emptyList(),
 ) {
     private val kx = cos(Math.toRadians((south + north) / 2)) * 111_320.0 / mpp
     private val ky = 110_574.0 / mpp

@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import app.postround.container
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
 import androidx.core.os.LocaleListCompat
 import app.postround.ui.art.Buf
 import app.postround.ui.components.Kind
@@ -73,6 +74,7 @@ fun SettingsView() {
         }
 
         HealthSection()
+        MoveSection()
 
         Text(w(ru, "сообщество", "community"), style = T.Eyebrow, modifier = Modifier.padding(top = 6.dp))
         Text(w(ru, "Игра делается вместе с теми, кто в неё играет. Всё идёт через бота StillCraft в Telegram.",
@@ -97,6 +99,37 @@ fun SettingsView() {
             "Карта района — © участники OpenStreetMap, тайлы OpenFreeMap. Погода — MET Norway (yr.no).\nРисунки, письма и жильцы сделаны для «До востребования».",
             "District map © OpenStreetMap contributors, tiles by OpenFreeMap. Weather by MET Norway (yr.no).\nPictures, letters and residents were made for Poste Restante."), style = T.Small)
     }
+}
+
+/** Moving house (#5): the round is drawn again around where the player stands, and nothing earned is lost. */
+@Composable
+private fun MoveSection() {
+    val ru = ru()
+    val c = LocalContext.current.container
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var sure by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var busy by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var error by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
+    val here = c.here.collectAsState().value
+    Text(w(ru, "переезд", "moving house"), style = T.Eyebrow, modifier = Modifier.padding(top = 6.dp))
+    Text(w(ru, "Переехали в другой район или город? Встаньте у новой парадной и нажмите кнопку: участок нарисуется заново. Истории, марки улиц, журнал и письма в «До востребования» останутся, а почта из сумки найдёт новые адреса.",
+        "Moved to another part of town, or another town? Stand at your new door and tap the button: the round is drawn again. Stories, street stamps, the journal and the Poste Restante letters stay, and the mail in the bag finds new addresses."), style = T.Small)
+    if (error.isNotEmpty()) Text(error, style = T.Small.copy(color = C.red))
+    PixelButton(
+        when { busy -> w(ru, "Рисуем новый участок…", "Drawing the new round…"); here == null -> w(ru, "Ждём, где вы", "Waiting for your position")
+            sure -> w(ru, "Точно переезжаем сюда?", "Move here for sure?"); else -> w(ru, "Переехать сюда", "Move here") },
+        {
+            val at = here ?: return@PixelButton
+            if (busy) return@PixelButton
+            if (!sure) { sure = true; return@PixelButton }
+            busy = true; error = ""
+            scope.launch {
+                runCatching { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { c.move(at) } }
+                    .onFailure { error = w(ru, "Карта не загрузилась. Проверьте интернет и попробуйте ещё раз.", "The map didn't load. Check the connection and try again.") }
+                busy = false; sure = false
+            }
+        }, Modifier.fillMaxWidth(), kind = if (sure) Kind.LAMP else Kind.GHOST,
+    )
 }
 
 /** Where the steps come from, as in Lipovka: the phone's own step counter, or Health Connect (health apps, watches, bands). */

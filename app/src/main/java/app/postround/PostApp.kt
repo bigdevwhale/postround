@@ -109,6 +109,8 @@ class AppContainer(context: Context) {
         val t = Terrain(d)
         district = d; terrain = t
         round = Round(d, t)
+        // after a move or with works newly left out, everyone whose house is gone finds a new one (#4, #5)
+        round?.let { r -> synchronized(this) { game.rehome(s, r) } }
         android.util.Log.i("Postround", "district ${d.w}x${d.h}, ${d.addrs.size} addresses, ${round?.houses?.size} houses")
     }
 
@@ -129,6 +131,23 @@ class AppContainer(context: Context) {
         s.home = at; s.box = box
         loadDistrict()
         wake()
+        changed()
+    }
+
+    /** Moving house (#5): a new district around where the player stands; stories, stamps and the journal stay. */
+    suspend fun move(at: Geo) = setHome(at)
+
+    /** The postman can't get near this house (#4). */
+    fun closeHouse(id: String) {
+        val s = state ?: return; val r = round ?: return
+        synchronized(this) { game.close(s, r, id) }
+        if (selected.value == id) selected.value = null
+        changed()
+    }
+
+    fun reopenHouse(id: String) {
+        val s = state ?: return
+        synchronized(this) { game.reopen(s, id) }
         changed()
     }
 

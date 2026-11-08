@@ -81,13 +81,60 @@ class Game(val c: Content) {
         return r.d.x(h.lon) to r.d.y(h.lat)
     }
 
-    /** Houses of the round today: within the radius around home. */
+    /** Houses of the round today: within the radius around home, and not marked unreachable. */
     fun onRound(s: GameState, r: Round): List<House> {
         val (hx, hy) = homeXY(s, r)
         val rad = radius(s) / r.d.mpp
-        val list = r.houses.filter { hypot((it.doorX - hx).toDouble(), (it.doorY - hy).toDouble()) <= rad }
+        val open = r.houses.filter { it.id !in s.closed }
+        val list = open.filter { hypot((it.doorX - hx).toDouble(), (it.doorY - hy).toDouble()) <= rad }
         // a sparse map: take the nearest forty, wherever they are
-        return if (list.size >= 25) list else r.houses.sortedBy { hypot((it.doorX - hx).toDouble(), (it.doorY - hy).toDouble()) }.take(40)
+        return if (list.size >= 25) list else open.sortedBy { hypot((it.doorX - hx).toDouble(), (it.doorY - hy).toDouble()) }.take(40)
+    }
+
+    /** Mail can go to this door: the post office, or a house on the map not marked unreachable. */
+    fun reachableDoor(s: GameState, r: Round, id: String) = id == "post" || (r.byId[id] != null && id !in s.closed)
+
+    /** The postman can't get near [id]: no more mail for it, and what was going there goes elsewhere (#4). */
+    fun close(s: GameState, r: Round, id: String) { s.closed += id; rehome(s, r) }
+
+    fun reopen(s: GameState, id: String) { s.closed -= id }
+
+    /**
+     * Everyone and everything whose house is gone from the map (after a move, #5) or marked unreachable (#4)
+     * gets a new one on the round: the people of the stories, the paper's subscribers, the mail in the bag and
+     * on its way. Stories, stamps and the journal stay as they were.
+     */
+    fun rehome(s: GameState, r: Round) {
+        val lost = s.cast.filterValues { !reachableDoor(s, r, it) }.keys.toList()
+        lost.forEach { s.cast.remove(it) }
+        if (lost.isNotEmpty()) castFor(s, r, lost)
+        val round = onRound(s, r)
+        if (round.isEmpty()) return
+        val rnd = Random(s.nextId * 31 + s.day)
+        s.subs.removeAll { !reachableDoor(s, r, it) }
+        s.cast["arist"]?.let { if (it !in s.subs) s.subs.add(0, it) }
+        while (s.subs.size < 3) {
+            val free = round.filter { it.kind == "home" && it.id !in s.subs && it.id !in s.cast.values }
+            if (free.isEmpty()) break
+            s.subs += free[rnd.nextInt(free.size)].id
+        }
+        s.threads.removeAll { !reachableDoor(s, r, it.first) || !reachableDoor(s, r, it.second) }
+        fun fix(list: MutableList<Item>) {
+            for (i in list.indices) {
+                val it = list[i]
+                if (reachableDoor(s, r, it.to)) continue
+                val to = when {
+                    it.arc.isNotEmpty() -> c.arc[it.arc]?.steps?.getOrNull(it.st)?.to?.let { k -> if (k == "post") "post" else s.cast[k] }
+                    it.kind == "riddle" -> riddleTarget(s, r)?.id
+                    it.kind == "paper" -> s.subs.getOrNull(rnd.nextInt(s.subs.size.coerceAtLeast(1)))
+                    else -> round[rnd.nextInt(round.size)].id
+                } ?: continue
+                list[i] = it.readdressed(to)
+            }
+            list.removeAll { !reachableDoor(s, r, it.to) }
+        }
+        fix(s.bag)
+        fix(s.queue)
     }
 
     /** Brings the bag up to today. Null when it's still the same day. */
@@ -171,7 +218,7 @@ class Game(val c: Content) {
             if (id in s.cast) continue
             val m = c.cast[id] ?: continue
             val taken = s.cast.values.toSet() + s.subs
-            val homes = round.filter { it.id !in taken && it.kind == "home" }.ifEmpty { r.houses.filter { it.id !in taken } }
+            val homes = round.filter { it.id !in taken && it.kind == "home" }.ifEmpty { r.houses.filter { it.id !in taken && it.id !in s.closed } }
             if (homes.isEmpty()) continue
             fun far(a: House, b: House) = hypot((a.doorX - b.doorX).toDouble(), (a.doorY - b.doorY).toDouble()) * r.d.mpp
             fun jitter(h: House) = Terrain.hash(Round.strHash(h.id + id).toInt(), 3)
@@ -374,7 +421,7 @@ class Game(val c: Content) {
         if (s.tgDay == now.day || now.hour !in 8..20 || c.telegrams.isEmpty() || s.day != now.day) return null
         val at = .25 + Terrain.hash(now.day.toInt(), 17) * 1.2
         if (s.kmToday < at) return null
-        val pool = r.houses.filter { val m = r.metresDoor(it, x, y); m in 150.0..520.0 }
+        val pool = r.houses.filter { it.id !in s.closed && r.metresDoor(it, x, y) in 150.0..520.0 }
         if (pool.isEmpty()) return null
         val h = pool[(Terrain.hash(now.day.toInt(), 23) * pool.size).toInt()]
         val m = r.metresDoor(h, x, y)
