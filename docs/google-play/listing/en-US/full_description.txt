@@ -1,0 +1,53 @@
+You are the postman of your own neighbourhood.
+
+The streets and house numbers are real, taken from the OpenStreetMap map; the people who live in them are made up. Every morning a bag waits for you at the post office: letters, postcards, papers, parcels. Mail is handed over only when you really stand at the house. Deliver it on the way to the shops, to work or on an evening walk.
+
+Free, no ads, no account.
+
+📮 THE ROUND
+Stand by your front door and the district is drawn around you with its house numbers. The round starts small, some three hundred metres, and grows with every letter you deliver.
+
+👜 THE MORNING BAG
+Letters, postcards, magazines, bills, papers for subscribers, parcels. The bag follows how much you've walked lately. No penalties: what you don't deliver today waits for tomorrow.
+
+🚪 AT THE DOOR
+Mail is handed over within thirty metres of the house, by GPS, and never from a tram or a car. You see the facade in the house's colour, the plate with its real number, the resident in the doorway and what they say.
+
+🧵 SIXTY STORIES BETWEEN HOUSES
+The residents write to each other, and you carry their letters back and forth: two old people who met on a skating rink in 1952, a game of chess by post, a grandmother and her granddaughter far away, rival mushroom pickers. A red thread on the map joins their houses. A new story starts every few days, seasonal ones wait for their time of year – a whole year of them.
+
+✉️ LETTERS WITH NO ADDRESS
+"To the people of the yellow five-storey house by the chemist's." No number, no street: find the house by its signs, walk up and ask the neighbours.
+
+⚡ TELEGRAMS
+They come while you walk and don't wait long.
+
+🖼️ A STAMP FOR EVERY STREET
+Every street has its own stamp: water and a bridge, a tram, a little park, roofs with a cat. It comes with your first delivery there.
+
+🏤 THE POSTE RESTANTE WINDOW
+When a correspondence ends, the residents write to the postman. Grades from postman third class to the postman everyone knows, the delivery log and a summary after each round.
+
+👣 THE ROUND IN A POCKET
+Tap "Start the round" and put the phone away: mail is handed over at the doors by itself, and you read what people said later.
+
+🌦️ REAL WEATHER
+Rain and snow in the game follow the real weather over your district, and the morning sheet tells you what to expect.
+
+STEPS
+From the phone's own step counter, or from Health Connect (Mi Fitness, Samsung Health, Google Fit, watches and bands). Steps are only read, never written or sent anywhere.
+
+PRIVATE BY DESIGN
+No accounts, no servers, no analytics, no ads. Your location and steps stay on the phone. The network is used only for the district map, once, when you pick your home, and for the weather with rounded coordinates.
+
+ALSO
+• English and Russian
+• Can't get to a house? Mark it, and its mail goes to a neighbour
+• Moved? Draw the round again around your new home, the stories stay
+• Free and open source (MIT)
+
+Tip: on Xiaomi, Huawei and some other phones, allow Autostart and remove battery limits so the round in a pocket isn't cut short.
+
+District map © OpenStreetMap contributors, tiles by OpenFreeMap. Weather by MET Norway.
+
+Poste Restante is part of Stillcraft, a family of small, quiet apps without ads or accounts.
