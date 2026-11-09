@@ -28,7 +28,7 @@ import app.postround.ui.components.PixelButton
 import app.postround.ui.theme.C
 import app.postround.ui.theme.T
 
-/** The StillCraft bot: deep links file a bug or an idea for this app, or follow its releases. */
+/** The StillCraft bot: deep links file a bug or an idea for this app, or follow its releases; and the support page on the web. */
 object Community {
     private const val BOT = "https://t.me/ArcaneWhisperBot?start="
     const val SLUG = "postround"
@@ -36,6 +36,7 @@ object Community {
     const val IDEA = "${BOT}wish_$SLUG"
     const val FOLLOW = "${BOT}f_$SLUG"
     const val CHAT = "https://t.me/+Q4gFEDk8O842OGVi"
+    const val SUPPORT = "https://bigdevwhale.github.io/stillcraft/support/"
 }
 
 /** A small brass gear for the top line. */
@@ -84,6 +85,7 @@ fun SettingsView() {
             Triple("💡", w(ru, "Предложить идею", "Suggest an idea"), Community.IDEA),
             Triple("🔔", w(ru, "Подписаться на обновления", "Follow updates"), Community.FOLLOW),
             Triple("💬", w(ru, "Чат StillCraft", "StillCraft chat"), Community.CHAT),
+            Triple("❤️", w(ru, "Поддержать «До востребования»", "Support Poste Restante"), Community.SUPPORT),
         )) {
             Panel(Modifier.fillMaxWidth(), fill = C.paper, onClick = { open(url) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {

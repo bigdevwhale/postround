@@ -46,8 +46,8 @@ the delivery log and what people said, stamps, grades, daily walked distance and
 
 ## Sharing
 
-- **Telegram links** in Settings (bug reports, wishes, the community) open Telegram or your browser only when you
-  tap them; what you do there is governed by those services' own policies.
+- **Links** in Settings (bug reports, wishes, the community on Telegram, the StillCraft support page) open Telegram
+  or your browser only when you tap them; what you do there is governed by those services' own policies.
 - **Backups.** Android may include the app's data in your own device backup to your Google account, if you have
   that turned on in system settings.
 
@@ -118,8 +118,8 @@ Telegram, <https://t.me/ArcaneWhisperBot>.
 
 ## Ссылки и обмен
 
-- **Ссылки на Telegram** в настройках (ошибки, пожелания, сообщество) открывают Telegram или браузер, только когда
-  вы на них нажимаете; там действуют правила этих сервисов.
+- **Ссылки** в настройках (ошибки, пожелания, сообщество в Telegram, страница поддержки StillCraft) открывают Telegram
+  или браузер, только когда вы на них нажимаете; там действуют правила этих сервисов.
 - **Резервная копия.** Android может включить данные приложения в резервную копию устройства в вашем
   аккаунте Google, если она включена в настройках.
 

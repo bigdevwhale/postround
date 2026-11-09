@@ -10,6 +10,7 @@ then close it like any HTML comment. The release notes carry it, and the chat bo
 
 ### Added
 - Each release also carries PosteRestante-v<version>.aab for Google Play, with every language inside so the in-app switch keeps working.
+- Settings → Community has a "Support Poste Restante" line: it opens the StillCraft support page.
 - The privacy policy in English and Russian, with what leaves the phone and how steps from Health Connect are used.
 
 <!-- tg skip -->
