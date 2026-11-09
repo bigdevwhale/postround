@@ -156,10 +156,11 @@ Entertainment — истории жильцов. Running и Weight loss не п�
 **Advertising ID** — *No* (рекламы и SDK аналитики нет, разрешения `AD_ID` в сборке нет).
 
 **Foreground service permissions** (появится после загрузки AAB: targetSdk 36 и `FOREGROUND_SERVICE_LOCATION`)
-- *What tasks require your app to use the FOREGROUND_SERVICE_LOCATION permission?* — варианты: Background
-  location updates, User-initiated location sharing, Navigation, Geofencing, Other. Отметить только **Other**:
-  «Background location updates» тянет проверку фонового местоположения (`ACCESS_BACKGROUND_LOCATION` нет),
-  «sharing» — это передача координат другим, «Navigation» — пошаговый маршрут. В «Other tasks»:
+- *What tasks require your app to use the FOREGROUND_SERVICE_LOCATION permission?* — в группе
+  **Background location updates** четыре галочки: User-initiated location sharing, Navigation, Geofencing, Other.
+  Отметить только **Other** в этой группе (с ⓘ): sharing — передача координат другим, Navigation — пошаговый
+  маршрут, Geofencing — системные зоны. Нижнюю группу «Other tasks → Other» (задачи не про местоположение)
+  не отмечать. Описание:
   > Poste Restante is a walking game in which mail is handed over only when the user stands at the house.
   > When the user taps "Start the round", a foreground service with a visible, ongoing notification keeps
   > receiving GPS positions, so letters are handed over at the doors while the phone is in a pocket and the
