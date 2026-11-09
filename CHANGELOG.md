@@ -6,6 +6,14 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.2.1] - 2026-11-09
+
+### Added
+- Each release also carries PosteRestante-v<version>.aab for Google Play, with every language inside so the in-app switch keeps working.
+- The privacy policy in English and Russian, with what leaves the phone and how steps from Health Connect are used.
+
+<!-- tg skip -->
+
 ## [1.2.0] - 2026-11-08
 
 - **«Can't get to this house»** on a house's card: no more mail goes there, and what was due goes to a neighbour. Houses inside works, railway yards, military land and garage rows are left out of the round by themselves (#4).
