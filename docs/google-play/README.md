@@ -166,7 +166,8 @@ Entertainment — истории жильцов. Running и Weight loss не п�
   > receiving GPS positions, so letters are handed over at the doors while the phone is in a pocket and the
   > screen is off. The service only starts on the user's tap, stops when they end the round from the app or
   > the notification, and positions never leave the device.
-- Ссылка на видео — см. раздел 0.
+- Ссылка на видео: `https://github.com/bigdevwhale/postround/blob/main/docs/google-play/foreground-service.mp4`
+  (ролик `foreground-service.mp4` в этой папке: старт обхода, уведомление в шторке, игра свёрнута, остановка).
 
 **Location permissions** — отдельной декларации не нужно: `ACCESS_BACKGROUND_LOCATION` не запрашивается,
 местоположение берётся только при открытой игре или в начатом пользователем обходе с уведомлением.
