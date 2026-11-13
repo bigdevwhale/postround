@@ -56,7 +56,7 @@ abstract class ScreensBase {
         val c = app.container
         if (c.state == null) DemoSeed.seed(c, javaClass.classLoader!!.getResource("petrogradka.osm.json")!!.readText())
         val t = c.terrain!!
-        if (MapCache.month != c.now().month) MapCache.load(app, t, c.now().month)
+        if (!MapCache.fits(t, c.now().month)) MapCache.load(app, t, c.now().month)
         c.morning = null
         c
     }

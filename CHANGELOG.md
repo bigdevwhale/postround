@@ -6,6 +6,16 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.2.2] - 2026-11-13
+
+### Fixed
+- After moving house the map kept the picture of the old district until the app was restarted, while the houses, their outlines and taps already followed the new one: the map looked stitched from several districts (#13), and the lit windows and street lamps glowed in the wrong places (#9). The map is now drawn again for the new district.
+
+<!-- tg
+Исправили карту после переезда: она больше не выглядит склеенной из разных районов, дома стоят там, где их подсвечивает нажатие.
+Свет окон и фонарей снова на своих местах.
+-->
+
 ## [1.2.1] - 2026-11-09
 
 ### Added

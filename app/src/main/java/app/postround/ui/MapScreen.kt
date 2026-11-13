@@ -82,11 +82,28 @@ private val ZOOMS = intArrayOf(80, 112, 160, 224, 320)
 object MapCache {
     private const val ART = 1
     var month = -1
+        private set
+    /** The terrain the picture was painted from: after a move (#5) the district is new and the old picture must go (#13, #9). */
+    var terrain: Terrain? = null
+        private set
     var buf: Buf? = null
+        private set
     var windows: List<Int> = emptyList()
+        private set
+
+    fun fits(t: Terrain, month: Int) = terrain === t && this.month == month
+
+    /** The terrain asked for last: a painting of an older one that finishes late is dropped. */
+    @Volatile private var want: Terrain? = null
+
+    @Synchronized private fun put(t: Terrain, month: Int, b: Buf, w: List<Int>) { if (want !== t) return; buf = b; windows = w; terrain = t; this.month = month }
+
+    @Synchronized private fun clear() { buf = null; windows = emptyList(); terrain = null; month = -1 }
 
     fun load(ctx: android.content.Context, t: Terrain, month: Int, px: Int = t.w / 2, py: Int = t.h / 2, quick: () -> Unit = {}) {
         val d = t.d
+        want = t
+        if (terrain !== t) clear()
         val f = java.io.File(ctx.cacheDir, "map_${ART}_${month}_${"%.4f_%.4f".format(java.util.Locale.US, d.south, d.west)}.bin")
         runCatching {
             java.io.DataInputStream(java.util.zip.GZIPInputStream(f.inputStream().buffered())).use { inp ->
@@ -94,17 +111,16 @@ object MapCache {
                 if (w != t.w || h != t.h) error("size")
                 val b = Buf(w, h)
                 for (i in b.d.indices) b.d[i] = inp.readInt()
-                windows = List(inp.readInt()) { inp.readInt() }
-                buf = b; this.month = month
+                put(t, month, b, List(inp.readInt()) { inp.readInt() })
                 return
             }
         }
         val near = MapPainter(t, month, px - 170, py - 210, px + 170, py + 210)
-        buf = near.paint(); windows = near.windows; this.month = month
+        put(t, month, near.paint(), near.windows)
         quick()
         val p = MapPainter(t, month)
         val b = p.paint()
-        buf = b; windows = p.windows; this.month = month
+        put(t, month, b, p.windows)
         runCatching {
             ctx.cacheDir.listFiles()?.filter { it.name.startsWith("map_") }?.forEach { it.delete() }
             java.io.DataOutputStream(java.util.zip.GZIPOutputStream(f.outputStream().buffered())).use { out ->
@@ -119,7 +135,8 @@ object MapCache {
 /** The outline of a raised building (roof and front wall) as map pixels, for the glow around a house with mail. */
 private object Outlines {
     private val cache = HashMap<Int, IntArray>()
-    fun of(t: Terrain, b: Block): IntArray = cache.getOrPut(b.index) {
+    private var of: Terrain? = null
+    fun of(t: Terrain, b: Block): IntArray = cache.also { if (of !== t) { it.clear(); of = t } }.getOrPut(b.index) {
         val set = HashSet<Int>()
         for (i in b.pts) { val x = i % t.w; val y = i / t.w; for (k in 0..b.h) set += (y - k) * t.w + x }
         val out = ArrayList<Int>()
@@ -160,11 +177,11 @@ fun MapScreen(nav: Nav) {
     val t = c.terrain; val d = c.district; val s = c.state; val r = c.round
     if (t == null || d == null || s == null || r == null) { Loading(); return }
     val now = c.now()
-    var ready by remember { mutableIntStateOf(if (MapCache.month == now.month) 1 else 0) }
+    var ready by remember(t) { mutableIntStateOf(if (MapCache.fits(t, now.month)) 1 else 0) }
     val me = here ?: s.home ?: return
     val mx = d.x(me.lon).roundToInt(); val my = d.y(me.lat).roundToInt()
-    LaunchedEffect(now.month) {
-        if (MapCache.month != now.month) { withContext(Dispatchers.Default) { MapCache.load(ctx, t, now.month, mx, my) { ready++ } }; ready++ }
+    LaunchedEffect(t, now.month) {
+        if (!MapCache.fits(t, now.month)) { withContext(Dispatchers.Default) { MapCache.load(ctx, t, now.month, mx, my) { ready++ } }; ready++ }
     }
     var pan by remember { mutableStateOf(IntOffset.Zero) }
     var zoom by remember { mutableIntStateOf(2) }
@@ -195,7 +212,7 @@ fun MapScreen(nav: Nav) {
             val img = remember(bmp) { bmp.asImageBitmap() }
             val cx = clampCam(mx - vw / 2 + pan.x, t.w, vw); val cy = clampCam(my - vh * 11 / 20 + pan.y, t.h, vh)
             val k = boxW / vw    // dp per map pixel
-            if (MapCache.month != now.month && ready == 0) Loading(Modifier.align(Alignment.Center))
+            if (!MapCache.fits(t, now.month) && ready == 0) Loading(Modifier.align(Alignment.Center))
             Canvas(Modifier.fillMaxSize()
                 .pointerInput(vw, vh) {
                     var acc = 1f
@@ -228,7 +245,10 @@ fun MapScreen(nav: Nav) {
                     )
                 }) {
                 val frame = tick + ready
+                // only a picture of this very district: an old one would put the houses where they aren't (#13)
+                if (MapCache.terrain !== t) return@Canvas
                 val base = MapCache.buf ?: return@Canvas
+                val lit = MapCache.windows
                 frame.let { }
                 for (y in 0 until vh) System.arraycopy(base.d, (cy + y) * base.w + cx, view.d, y * vw, vw)
                 System.arraycopy(view.d, 0, under, 0, under.size)
@@ -238,7 +258,7 @@ fun MapScreen(nav: Nav) {
                 objs += my - cy to { view.postman(mx - cx, my - cy, if (walking) (tick / 2) % 2 else 0, false, now.sky.rain) }
                 objs.sortedBy { it.first }.forEach { it.second() }
                 for (i in under.indices) front[i] = view.d[i] != under[i]
-                view.streetLife(t, cx, cy, moment, tick, MapCache.windows, mx - cx, my - cy, front)
+                view.streetLife(t, cx, cy, moment, tick, lit, mx - cx, my - cy, front)
                 // after the night falls: the glow of houses with mail, the threads, the route — they must read in the dark
                 val on = (tick / 4) % 2 == 0
                 for ((id, items) in withMail) {
