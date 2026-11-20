@@ -1,5 +1,8 @@
 package app.postround.ui
 
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -83,6 +86,20 @@ fun BagScreen(nav: Nav) {
                     Text(w(ru, "Номера нет, улицы тоже. Найдите дом по приметам, подойдите и спросите — жильцы подскажут, куда идти.",
                         "No number, no street. Find the house by the signs, walk up and ask — the people there will point the way."), style = T.Small, modifier = Modifier.padding(top = 4.dp))
                     if (s.riddleTries > 0) Text(w(ru, "Спрашивали уже ${s.riddleTries} раз.", "Asked ${s.riddleTries} times so far."), style = T.Small)
+                    val h = r.byId[rd.to]
+                    if (h != null && c.game.revealed(s, rd, c.now())) {
+                        // not found in time: the house is shown outright (#20)
+                        var sure by remember { mutableStateOf(false) }
+                        Text(w(ru, "Галина нашла в старой книге пометку Сомовой: это ${h.addr(true)}.", "Galina found Mrs Somers' mark in the old book: it's ${h.addr(false)}."),
+                            style = T.Body.copy(color = C.blue), modifier = Modifier.padding(top = 6.dp))
+                        Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            PixelButton(w(ru, "На карте", "On the map"), { c.selected.value = h.id; nav.tab(0) }, Modifier.weight(1f), Kind.LAMP)
+                            PixelButton(if (sure) w(ru, "Точно нет?", "Sure?") else w(ru, "Там нет дома", "No house there"), { if (sure) c.noSuchHouse() else sure = true }, Modifier.weight(1f), Kind.GHOST)
+                        }
+                        Text(w(ru, "Если на месте дома нет (карта бывает неточной), нажмите «Там нет дома» — письмо найдёт другой адрес.",
+                            "If there's no house on the spot (the map can be wrong), tap \"No house there\" and the letter finds another one."), style = T.Small, modifier = Modifier.padding(top = 4.dp))
+                    } else Text(w(ru, "Не нашли за пару дней или после пяти расспросов — Галина подскажет точный дом.",
+                        "Not found in a couple of days or after five doors, Galina will point out the very house."), style = T.Small)
                 }
             }
         }
@@ -203,7 +220,7 @@ fun WindowScreen(nav: Nav) {
                     Column(Modifier.weight(1f)) {
                         Text(w(ru, "Журнал вручений", "The delivery log"), style = T.Body)
                         Text(if (n > 0) w(ru, "Сегодня вручено ${countItems(n, true)} — кому и что", "Today: ${countItems(n, false)} — to whom and what")
-                             else w(ru, "Кому и что вы вручили за последние дни", "Who you delivered what to, these last days"), style = T.Small)
+                             else w(ru, "Кому и что вы вручили — за три месяца", "Who you delivered what to — three months of it"), style = T.Small)
                     }
                 }
             }
@@ -243,11 +260,27 @@ fun WindowScreen(nav: Nav) {
                 }
             }
         }
-        if (s.gifts.isNotEmpty()) {
-            item { Eyebrow(w(ru, "карманы", "pockets"), Modifier.padding(top = 4.dp)) }
-            item {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    s.gifts.distinct().forEach { Text(giftText(it, ru), style = T.Small.copy(color = C.ink), modifier = Modifier.pixelBox(C.paper2, bevel = null).padding(horizontal = 7.dp, vertical = 3.dp)) }
+        // the box: what people gave the postman, who and when (#11)
+        item { Eyebrow(w(ru, "шкатулка", "the keepsake box"), Modifier.padding(top = 4.dp)) }
+        item {
+            Panel(Modifier.fillMaxWidth(), fill = C.paper2) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    BufImage(MailIcons.of("parcel"), Modifier.padding(end = 10.dp), 3.dp)
+                    Column(Modifier.weight(1f)) {
+                        Text(w(ru, "Подарки почтальону", "Gifts to the postman"), style = T.Body)
+                        Text(if (s.gifts.isEmpty()) w(ru, "Пока пусто. Жильцы иногда что-нибудь дарят у двери: конфету, яблоко, открытку.", "Empty so far. People sometimes give something at the door: a sweet, an apple, a card.")
+                             else w(ru, "${s.gifts.size} ${plural(s.gifts.size, "вещица", "вещицы", "вещиц")}", "${s.gifts.size} keepsake" + if (s.gifts.size == 1) "" else "s"), style = T.Small)
+                    }
+                }
+                s.gifts.groupBy { giftText(it, ru) }.entries.reversed().forEach { (name, all) ->
+                    val p = all.last().split("|")
+                    val who = p.getOrNull(2)?.let { id -> r.byId[id] }?.let { h -> c.game.resident(s, h).name(ru) }
+                    val day = p.getOrNull(3)?.toLongOrNull()
+                    Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(name + if (all.size > 1) " ×${all.size}" else "", style = T.Body.copy(color = C.ink), modifier = Modifier.weight(1f))
+                        val note = listOfNotNull(who, day?.let { dayName(it, ru) }).joinToString(" · ")
+                        if (note.isNotEmpty()) Text(note, style = T.Small, maxLines = 1)
+                    }
                 }
             }
         }

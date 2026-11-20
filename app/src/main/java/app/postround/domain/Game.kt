@@ -147,10 +147,8 @@ class Game(val c: Content) {
         val rnd = Random(now.day * 7919 + s.nextId)
         // yesterday's papers go to the recycling, an old telegram is taken over by the day shift
         s.bag.removeAll { it.kind == "paper" || it.kind == "telegram" && it.arc.isEmpty() }
-        // what was promised for today
-        val due = s.queue.filter { it.arrive <= now.day }
-        s.queue.removeAll(due.toSet())
-        due.forEach { s.bag += it.copy(id = s.nextId++) }
+        // what was promised for today, as far as the bag holds it; a telegram waits for the day shift (#24)
+        topUp(s, now)
         val round = onRound(s, r)
         if (s.subs.isEmpty()) {
             castFor(s, r, listOf("arist"))
@@ -173,7 +171,7 @@ class Game(val c: Content) {
         }
         // the letter with no address: from the second day, one at a time
         if (now.day >= s.started + 1 && now.day >= s.riddleNext && s.bag.none { it.kind == "riddle" } && c.riddles.isNotEmpty()) riddleTarget(s, r)?.let { h ->
-            s.bag += Item(s.nextId++, "riddle", h.id, v = s.riddles % c.riddles.size)
+            s.bag += Item(s.nextId++, "riddle", h.id, v = s.riddles % c.riddles.size, arrive = now.day)
         }
         for (h in s.subs) if (r.byId[h] != null) {
             val v = if (s.cast["arist"] == h && s.paperN < c.arist.size) s.paperN else ANY_PAPER + deck(s.paperUsed, c.anyPaper.indices.filter { c.anyPaper[it].dow == 0 || c.anyPaper[it].dow == now.date.dayOfWeek.value }, rnd)
@@ -284,7 +282,7 @@ class Game(val c: Content) {
             if (it.kind == "paper" && it.v < ANY_PAPER) s.paperN++
             val sh = show(s, it, late)
             shown += sh
-            if (!sh.gift.blank) s.gifts += sh.gift.ru + "|" + sh.gift.en
+            if (!sh.gift.blank) s.gifts += sh.gift.ru + "|" + sh.gift.en + "|" + houseId + "|" + now.day
             step(it)?.let { st -> notes += advance(s, r, now, it, st) }
             if (it.kind == "pickup") s.done += 0 else s.done++
         }
@@ -294,6 +292,7 @@ class Game(val c: Content) {
         var stamp: String? = null
         if (h.street !in s.streets) { s.streets[h.street] = now.day; s.today().streets++; stamp = h.street }
         val up = rank(s).takeIf { it > rankBefore }?.let { RANKS[it].second }
+        topUp(s, now)
         return Result(h, shown, notes, stamp, up)
     }
 
@@ -353,7 +352,49 @@ class Game(val c: Content) {
         }
     }
 
+    /**
+     * Mail promised for today comes into the bag as far as it holds it (#24): the rest waits in the queue for room
+     * or for tomorrow. A telegram from a story comes only in the day shift, 8:00–21:00, never into the night bag.
+     */
+    fun topUp(s: GameState, now: Now): List<Item> {
+        val out = ArrayList<Item>()
+        for (it in s.queue.filter { it.arrive <= now.day }.sortedBy { it.arrive }) {
+            if (it.kind == "telegram" && now.hour !in 8..20) continue
+            if (load(s) + it.weight > cap(s)) continue
+            s.queue.remove(it)
+            val n = it.copy(id = s.nextId++)
+            s.bag += n; out += n
+        }
+        return out
+    }
+
+    /** A telegram turned down (#12): the day shift takes it; it counts neither way. */
+    fun refuse(s: GameState, id: Long): Boolean {
+        val tg = s.bag.firstOrNull { it.id == id && it.kind == "telegram" && it.arc.isEmpty() } ?: return false
+        s.bag.remove(tg)
+        return true
+    }
+
     // ------------------------------------------------------------------ letters with no address
+
+    /**
+     * The house of the letter with no address is shown outright (#20) after two days of looking or five wrong doors:
+     * the old postwoman's mark turns up. Old letters without their first day count from when they could come.
+     */
+    fun revealed(s: GameState, it: Item, now: Now): Boolean {
+        val since = if (it.arrive > 0) it.arrive else s.riddleNext
+        return s.riddleTries >= REVEAL_TRIES || now.day - since >= REVEAL_DAYS
+    }
+
+    /** The marked house isn't there on the ground (the map is wrong): it is left out and the letter finds another (#20). */
+    fun noSuchHouse(s: GameState, r: Round, now: Now): Boolean {
+        val it = s.bag.firstOrNull { it.kind == "riddle" } ?: return false
+        s.closed += it.to
+        s.bag.remove(it)
+        s.riddleTries = 0
+        riddleTarget(s, r)?.let { h -> s.bag += Item(s.nextId++, "riddle", h.id, v = it.v, arrive = now.day) } ?: run { s.riddleNext = now.day + 1 }
+        return true
+    }
 
     private fun riddleTarget(s: GameState, r: Round): House? {
         val round = onRound(s, r).filter { it.kind == "home" && it.id !in s.cast.values && it.id !in s.subs && it.id !in s.riddleUsed }
@@ -421,7 +462,11 @@ class Game(val c: Content) {
         if (s.tgDay == now.day || now.hour !in 8..20 || c.telegrams.isEmpty() || s.day != now.day) return null
         val at = .25 + Terrain.hash(now.day.toInt(), 17) * 1.2
         if (s.kmToday < at) return null
-        val pool = r.houses.filter { it.id !in s.closed && r.metresDoor(it, x, y) in 150.0..520.0 }
+        val near = r.houses.filter { it.id !in s.closed && r.metresDoor(it, x, y) in 150.0..520.0 }
+        // the way home rather than the other way (#12): houses no farther from home than where the postman stands
+        val (hx, hy) = homeXY(s, r)
+        val here = hypot((x - hx).toDouble(), (y - hy).toDouble())
+        val pool = near.filter { hypot((it.doorX - hx).toDouble(), (it.doorY - hy).toDouble()) <= here + 60 / r.d.mpp }.ifEmpty { near }
         if (pool.isEmpty()) return null
         val h = pool[(Terrain.hash(now.day.toInt(), 23) * pool.size).toInt()]
         val m = r.metresDoor(h, x, y)
@@ -475,6 +520,8 @@ class Game(val c: Content) {
         )
         /** The palette of facades (the map's G.FAC order) → colour names. */
         val COLOUR_IDX = intArrayOf(0, 1, 2, 3, 4, 0, 1, 5, 4)
+        const val REVEAL_DAYS = 2
+        const val REVEAL_TRIES = 5
         val COLOURS = listOf(Tx("жёлтого", "yellow"), Tx("розового", "pink"), Tx("зелёного", "green"), Tx("голубого", "blue"), Tx("белого", "white"), Tx("сиреневого", "lilac"))
         val STOREYS_RU = listOf("", "одноэтажного", "двухэтажного", "трёхэтажного", "четырёхэтажного", "пятиэтажного", "шестиэтажного", "семиэтажного", "восьмиэтажного", "девятиэтажного",
             "десятиэтажного", "одиннадцатиэтажного", "двенадцатиэтажного")

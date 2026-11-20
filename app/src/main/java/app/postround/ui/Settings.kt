@@ -76,6 +76,7 @@ fun SettingsView() {
 
         HealthSection()
         MoveSection()
+        SaveSection()
 
         Text(w(ru, "сообщество", "community"), style = T.Eyebrow, modifier = Modifier.padding(top = 6.dp))
         Text(w(ru, "Игра делается вместе с теми, кто в неё играет. Всё идёт через бота StillCraft в Telegram.",
@@ -196,4 +197,49 @@ private fun HealthSection() {
     }
     Text(status, style = T.Small.copy(color = if (bad) C.red else C.green))
     if (today >= 0) Text(w(ru, "Сегодня: %,d шагов", "Today: %,d steps").format(today).replace(',', ' '), style = T.Body.copy(color = C.green))
+}
+
+/** The save as a file (#23, #16): to keep, to take to another phone, to mend by hand if it ever comes to that. */
+@Composable
+private fun SaveSection() {
+    val ru = ru()
+    val ctx = LocalContext.current
+    val c = ctx.container
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var note by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<Pair<String, Boolean>?>(null) }
+    var pending by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<Uri?>(null) }
+    var busy by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val save = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        note = runCatching { ctx.contentResolver.openOutputStream(uri)!!.use { it.write(c.backup().toByteArray()) } }
+            .fold({ w(ru, "Сохранено. Храните файл где-нибудь вне телефона.", "Saved. Keep the file somewhere off the phone.") to true }, { w(ru, "Не получилось сохранить файл.", "Couldn't save the file.") to false })
+    }
+    val load = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri -> pending = uri }
+    Text(w(ru, "сохранение", "the save"), style = T.Eyebrow, modifier = Modifier.padding(top = 6.dp))
+    Text(w(ru, "Весь прогресс — сумка, истории, марки, журнал, шкатулка — в одном файле. Пригодится для нового телефона. Файл обычный, текстовый (JSON): при нужде его можно поправить.",
+        "All the progress — the bag, the stories, the stamps, the journal, the box — in one file. Handy for a new phone. It's a plain text file (JSON) that can be mended by hand if needed."), style = T.Small)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        PixelButton(w(ru, "Сохранить", "Save"), { save.launch("postround-" + java.time.LocalDate.now() + ".json") }, Modifier.weight(1f), kind = Kind.GHOST)
+        PixelButton(if (busy) w(ru, "Загружаем…", "Loading…") else w(ru, "Загрузить", "Load"), { if (!busy) load.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }, Modifier.weight(1f), kind = Kind.GHOST)
+    }
+    pending?.let { uri ->
+        Panel(Modifier.fillMaxWidth().padding(top = 6.dp), fill = C.lamp) {
+            Text(w(ru, "Загрузить сохранение вместо этой игры? Нынешний прогресс заменится тем, что в файле.", "Load the save in place of this game? The progress now is replaced by the file's."), style = T.Body)
+            Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PixelButton(w(ru, "Загрузить", "Load it"), {
+                    pending = null; busy = true; note = null
+                    scope.launch {
+                        val text = runCatching { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { ctx.contentResolver.openInputStream(uri)!!.use { it.readBytes().decodeToString() } } }.getOrNull()
+                        note = runCatching { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { c.restore(text ?: error("unreadable")) } }
+                            .fold({ w(ru, "Готово: игра загружена из файла.", "Done: the game is loaded from the file.") to true },
+                                { e -> (if (e is IllegalArgumentException || e is org.json.JSONException) w(ru, "Это не файл сохранения «До востребования».", "That isn't a Poste Restante save file.")
+                                        else w(ru, "Не получилось: проверьте интернет — карту района нужно загрузить заново.", "It didn't work: check the connection, the district map has to be downloaded again.")) to false })
+                        busy = false
+                    }
+                }, Modifier.weight(1f), kind = Kind.LAMP)
+                PixelButton(w(ru, "Отмена", "Cancel"), { pending = null }, Modifier.weight(1f), kind = Kind.GHOST)
+            }
+        }
+    }
+    note?.let { (t, ok) -> Text(t, style = T.Small.copy(color = if (ok) C.green else C.red)) }
 }

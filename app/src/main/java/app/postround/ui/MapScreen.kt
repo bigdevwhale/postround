@@ -399,6 +399,13 @@ private fun ActionPanel(c: AppContainer, nav: Nav, me: Geo, route: List<House>, 
             Panel(Modifier.fillMaxWidth(), fill = C.telegram, onClick = { c.selected.value = tg.to }) {
                 Text(w(ru, "телеграмма · вручить до ", "telegram · deliver by ") + hhmm(tg.due), style = T.Eyebrow.copy(color = C.redDeep))
                 Text((h?.addr(ru) ?: "") + " · " + if (left > 0) w(ru, "осталось $left мин", "$left min left") else w(ru, "опаздывает", "running late"), style = T.Body)
+                // not on the way: hand it back to the day shift (#12)
+                var refuse by remember(tg.id) { mutableStateOf(false) }
+                if (tg.arc.isEmpty()) Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (refuse) w(ru, "Отдать дневной смене? В счёт телеграмм не пойдёт.", "Give it to the day shift? It won't count either way.") else w(ru, "Не по пути?", "Not on your way?"),
+                        style = T.Small, modifier = Modifier.weight(1f))
+                    PixelButton(if (refuse) w(ru, "Отдать", "Give it") else w(ru, "Отказаться", "Turn down"), { if (refuse) c.refuse(tg.id) else refuse = true }, kind = Kind.GHOST)
+                }
             }
         }
         if (riding) Text(w(ru, "Вы едете — из транспорта письма не вручают. Выйдите и подойдите к дому.", "You're riding — mail isn't handed over from a vehicle. Get off and walk up to the house."), style = T.Small.copy(color = C.red))
@@ -439,7 +446,10 @@ private fun ActionPanel(c: AppContainer, nav: Nav, me: Geo, route: List<House>, 
                             val n = items.count { o -> o.kind == it.kind }
                             Text(kindName(it.kind, ru) + (if (n > 1) " ×$n" else "") + " — " + kindHint(it.kind, ru), style = T.Small.copy(color = C.ink), maxLines = 2)
                         }
-                        if (items.isEmpty() && pick != null) Text(w(ru, "Сегодня для этого дома ничего нет.", "Nothing for this house today."), style = T.Small)
+                        // the house the old postwoman's mark points to (#20)
+                        val riddleHere = s.bag.firstOrNull { it.kind == "riddle" }?.takeIf { it.to == target.id && c.game.revealed(s, it, c.now()) }
+                        if (riddleHere != null) Text(w(ru, "Сюда письмо без адреса: подойдите и спросите.", "The letter with no address is for here: walk up and ask."), style = T.Small.copy(color = C.blue))
+                        else if (items.isEmpty() && pick != null) Text(w(ru, "Сегодня для этого дома ничего нет.", "Nothing for this house today."), style = T.Small)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         DirArrow(ang, size = 24.dp, color = C.green)

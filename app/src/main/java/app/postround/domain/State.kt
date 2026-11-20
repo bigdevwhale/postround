@@ -120,7 +120,7 @@ class GameState {
     fun journal(h: Handed) {
         delivered += h
         delivered.removeAll { it.day <= h.day - JOURNAL_DAYS }
-        while (delivered.size > 400) delivered.removeAt(0)
+        while (delivered.size > 3000) delivered.removeAt(0)
     }
 
     fun today(): DayLog = log.lastOrNull()?.takeIf { it.day == day } ?: DayLog(day).also { log += it; while (log.size > 40) log.removeAt(0) }
@@ -146,7 +146,8 @@ class GameState {
     }
 
     companion object {
-        const val JOURNAL_DAYS = 7
+        /** The delivery diary keeps three months (#17). */
+        const val JOURNAL_DAYS = 92
         fun fromJson(o: JSONObject): GameState = GameState().apply {
             o.optJSONArray("home")?.let { home = Geo(it.getDouble(0), it.getDouble(1)) }
             o.optJSONArray("box")?.let { a -> box = DoubleArray(a.length()) { a.getDouble(it) } }

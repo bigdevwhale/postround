@@ -195,6 +195,7 @@ class AppContainer(context: Context) {
         val now = now()
         store.remember(now.day, now.sky)
         game.morning(s, r, now)?.let { m -> if (!m.fresh || s.bag.isNotEmpty()) morning = m }
+        game.topUp(s, now)
         changed()
     }
 
@@ -242,6 +243,40 @@ class AppContainer(context: Context) {
         return res
     }
 
+    /** Turns a telegram down (#12). */
+    @Synchronized
+    fun refuse(id: Long) { val s = state ?: return; if (game.refuse(s, id)) { telegram.value = null; changed() } }
+
+    /** The marked house of the letter with no address isn't there (#20). */
+    @Synchronized
+    fun noSuchHouse() { val s = state ?: return; val r = round ?: return; if (game.noSuchHouse(s, r, now())) { selected.value = null; changed() } }
+
+    /** The whole save as a file to keep (#23, #16): plain JSON, readable and editable. */
+    fun backup(): String {
+        val s = state ?: return "{}"
+        return org.json.JSONObject().put("app", "postround").put("v", 1).put("at", System.currentTimeMillis()).put("state", s.toJson()).toString(1)
+    }
+
+    /** Loads a saved file in place of this game; the district around its home is downloaded again if needed. */
+    suspend fun restore(text: String) {
+        val o = org.json.JSONObject(text)
+        require(o.optString("app") == "postround") { "not a postround file" }
+        val s = GameState.fromJson(o.getJSONObject("state"))
+        val home = s.home ?: error("no home")
+        val box = s.box ?: District.box(home.lat, home.lon, DISTRICT_HALF)
+        val same = state?.box?.contentEquals(box) == true && store.hasDistrict()
+        if (!same) {
+            stage.value = "download"
+            val tiles = try { withContext(Dispatchers.IO) { Tiles.download(box) } } catch (e: Exception) { stage.value = ""; throw e }
+            store.saveTiles(tiles)
+        }
+        s.box = box
+        synchronized(this) { state = s }
+        loadDistrict()
+        wake()
+        changed()
+    }
+
     @Synchronized
     fun ask(houseId: String): Asked? {
         val s = state ?: return null; val r = round ?: return null
@@ -275,6 +310,7 @@ class AppContainer(context: Context) {
             if (m in 3.0..300.0 && !riding.value) {
                 val (x, y) = xy(at) ?: return@let
                 game.walked(s, r, now, m, x, y)?.let { tg -> telegram.value = tg; notify(Notes.telegram(this, tg)) }
+                game.topUp(s, now)
             }
         }
         lastFix = at; lastFixAt = t
