@@ -6,6 +6,28 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.3.0] - 2026-11-20
+
+### Added
+- **The save as a file:** Settings → the save → "Save" and "Load". All the progress in one plain JSON file, for a new phone or to mend by hand; on another phone the district map is downloaded again by itself (#23, #16).
+- **The keepsake box** in the poste restante window: the gifts people gave the postman, who gave them and when, repeats counted (#11).
+- **Turning a telegram down:** one that isn't on your way can go back to the day shift; it counts neither way (#12).
+
+### Changed
+- **The letter with no address:** not found in two days or after five doors, Galina finds Mrs Somers' mark and names the very house, with "On the map" and "No house there" for a house the map has wrong (the letter then finds another) (#20).
+- **The delivery log** keeps three months instead of a week (#17).
+- New telegrams pick a house on the way home rather than the other way (#12).
+
+### Fixed
+- A telegram from a story no longer comes in the night bag: it waits for the day shift, 8:00–21:00. Mail promised for the day comes only while the bag has room; the rest waits until there is some (#24).
+
+<!-- tg
+Прогресс можно сохранить в файл и загрузить на другом телефоне: настройки → «Сохранение»
+Письмо без адреса больше не мучает: через пару дней Галина назовёт точный дом, а если его нет на месте – письмо найдёт другой адрес
+Телеграмму не по пути можно отдать дневной смене, в «Окошке» появилась шкатулка подарков, журнал вручений хранит три месяца
+Исправлено: телеграммы из историй не приходят ночью и в полную сумку
+-->
+
 ## [1.2.3] - 2026-11-16
 
 ### Fixed
